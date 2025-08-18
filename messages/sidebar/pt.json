@@ -1,0 +1,7 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+  "nav_user": {
+    "profile": "Perfil",
+    "notifications": "Notificações"
+  }
+}
