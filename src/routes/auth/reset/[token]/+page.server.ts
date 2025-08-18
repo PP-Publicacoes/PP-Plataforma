@@ -8,8 +8,8 @@ import { consumePasswordResetToken } from '$lib/server/reset';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
-import { hash } from '@node-rs/argon2';
 import * as auth from '$lib/server/auth';
+import { hashPassword } from '$lib/server/password';
 
 export const load: PageServerLoad = async (event) => {
   const token = event.params.token;
@@ -43,12 +43,7 @@ export const actions: Actions = {
 
     // Atualiza a senha
     const { password } = form.data as ResetPasswordInput;
-    const passwordHash = await hash(password, {
-      memoryCost: 19456,
-      timeCost: 2,
-      outputLen: 32,
-      parallelism: 1
-    });
+    const passwordHash = await hashPassword(password);
 
     await db.update(table.user).set({ passwordHash }).where(eq(table.user.id, userId));
 
