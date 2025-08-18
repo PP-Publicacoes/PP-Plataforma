@@ -10,7 +10,7 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import {
-    loginSchema,
+	loginSchema,
 	registerSchema,
 	type LoginInput,
 	type RegisterInput
@@ -18,7 +18,7 @@ import {
 import { m } from '$lib/paraglide/messages';
 import { generateDeterministicSlug } from '$lib/utils/random';
 import { AuthTab } from '$lib/enums/auth-tab';
-import { verifyPassword } from '$lib/server/password';
+import { hashPassword, verifyPassword } from '$lib/server/password';
 
 export const load: PageServerLoad = async (event: RequestEvent) => {
 	// Retorna o usuário quando houver sessão ativa, caso contrário retorna {}.
@@ -58,12 +58,7 @@ export const actions: Actions = {
 		}
 
 		// verifica senha
-		const validPassword = await verifyPassword(existingUser.passwordHash, password as string, {
-			memoryCost: 19456,
-			timeCost: 2,
-			outputLen: 32,
-			parallelism: 1
-		});
+		const validPassword = await verifyPassword(existingUser.passwordHash, password);
 
 		if (!validPassword) {
 			form.valid = false;
@@ -95,7 +90,7 @@ export const actions: Actions = {
 		const byUsername = await db.select().from(table.user).where(eq(table.user.username, username));
 		if (byUsername.length > 0) {
 			form.valid = false;
-      form.errors?.username?.push(m['errors.form.username.exists']());
+			form.errors?.username?.push(m['errors.form.username.exists']());
 
 			return fail(400, { form });
 		}
@@ -109,12 +104,7 @@ export const actions: Actions = {
 		}
 
 		// hash da senha
-		const passwordHash = await hash(password, {
-			memoryCost: 19456,
-			timeCost: 2,
-			outputLen: 32,
-			parallelism: 1
-		});
+		const passwordHash = await hashPassword(password);
 
 		// gera id do usuário (usa sua função generateUserId)
 		const userId = generateUserId();
@@ -125,7 +115,7 @@ export const actions: Actions = {
 				username,
 				email,
 				passwordHash,
-        slug: generateDeterministicSlug(userId),
+				slug: generateDeterministicSlug(userId)
 			});
 
 			// cria sessão e seta cookie

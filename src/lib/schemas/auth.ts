@@ -1,37 +1,37 @@
 import { m } from '$lib/paraglide/messages';
-import z4 from 'zod/v4';
+import { z } from 'zod/v4';
 
 /** login */
-export const loginSchema = z4.object({
-	username: z4
+export const loginSchema = z.object({
+	username: z
 		.string()
-		.nonempty({ message: m['errors.form.username.required']() })
-		.min(3, { message: m['errors.form.username.min']() })
-		.max(30, { message: m['errors.form.username.max']() }),
-	password: z4
+		.nonempty({ error: m['errors.form.username.required']() })
+		.min(3, { error: m['errors.form.username.min']() })
+		.max(30, { error: m['errors.form.username.max']() }),
+	password: z
 		.string()
-		.min(6, { message: m['errors.form.password.min']() })
-		.max(30, { message: m['errors.form.password.max']() })
+		.min(6, { error: m['errors.form.password.min']() })
+		.max(30, { error: m['errors.form.password.max']() })
 });
 
 export type LoginSchema = typeof loginSchema;
-export type LoginInput = z4.infer<typeof loginSchema>;
+export type LoginInput = z.infer<typeof loginSchema>;
 
 /** register */
-export const registerSchema = z4
+export const registerSchema = z
 	.object({
-		username: z4
+		username: z
 			.string()
-			.nonempty({ message: m['errors.form.username.required']() })
-			.min(2, { message: m['errors.form.username.min']() })
-			.max(20, { message: m['errors.form.username.max']() }),
-		email: z4
-			.email({ message: m['errors.form.email.error']() })
-			.nonempty({ message: m['errors.form.email.required']() }),
-		password: z4
+			.nonempty({ error: m['errors.form.username.required']() })
+			.min(2, { error: m['errors.form.username.min']() })
+			.max(20, { error: m['errors.form.username.max']() }),
+		email: z
+			.email({ error: m['errors.form.email.error']() })
+			.nonempty({ error: m['errors.form.email.required']() }),
+		password: z
 			.string()
-			.min(8, { message: m['errors.form.password.min']() })
-			.max(20, { message: m['errors.form.password.max']() })
+			.min(8, { error: m['errors.form.password.min']() })
+			.max(20, { error: m['errors.form.password.max']() })
 			.refine((password) => /[A-Z]/.test(password), {
 				error: m['errors.form.password.loweracse']()
 			})
@@ -42,7 +42,7 @@ export const registerSchema = z4
 			.refine((password) => /[!@#$%^&*]/.test(password), {
 				error: m['errors.form.password.special']()
 			}),
-		confirmPassword: z4.string()
+		confirmPassword: z.string()
 	})
 	.refine((data) => data.password === data.confirmPassword, {
 		error: m['errors.form.password.confirm_mismatch'](),
@@ -50,21 +50,21 @@ export const registerSchema = z4
 	});
 
 export type RegisterSchema = typeof registerSchema;
-export type RegisterInput = z4.infer<typeof registerSchema>;
+export type RegisterInput = z.infer<typeof registerSchema>;
 
-export const forgotSchema = z4.object({
-	email: z4
-		.email({ message: m['errors.form.email.error']() })
-		.nonempty({ message: m['errors.form.email.required']() })
+export const forgotSchema = z.object({
+	email: z
+		.email({ error: m['errors.form.email.error']() })
+		.nonempty({ error: m['errors.form.email.required']() })
 });
-export type ForgotInput = z4.infer<typeof forgotSchema>;
+export type ForgotInput = z.infer<typeof forgotSchema>;
 
-export const resetPasswordSchema = z4
+export const resetPasswordSchema = z
 	.object({
-		password: z4
+		password: z
 			.string()
-			.min(8, { message: m['errors.form.password.min']() })
-			.max(20, { message: m['errors.form.password.max']() })
+			.min(8, { error: m['errors.form.password.min']() })
+			.max(20, { error: m['errors.form.password.max']() })
 			.refine((password) => /[A-Z]/.test(password), {
 				error: m['errors.form.password.loweracse']()
 			})
@@ -75,11 +75,11 @@ export const resetPasswordSchema = z4
 			.refine((password) => /[!@#$%^&*]/.test(password), {
 				error: m['errors.form.password.special']()
 			}),
-		confirmPassword: z4.string()
+		confirmPassword: z.string()
 	})
 	.refine((data) => data.password === data.confirmPassword, {
 		error: m['errors.form.password.confirm_mismatch'](),
 		path: ['confirmPassword']
 	});
 
-export type ResetPasswordInput = z4.infer<typeof resetPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
