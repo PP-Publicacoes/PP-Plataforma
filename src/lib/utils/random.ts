@@ -3,8 +3,8 @@
  *  - XXX é derivado do userId (por hash) por padrão
  *  - opção useRawSuffix tenta extrair dígitos do userId
  */
-import { adjectives } from './adjectives';
-import { animals } from './animals';
+import { adjectives } from '../consts/adjectives';
+import { animals } from '../consts/animals';
 
 // normalização para slug: remove acentos, lower-case, substitui tudo que não for alfanum por '-'
 function slugify(s: string) {

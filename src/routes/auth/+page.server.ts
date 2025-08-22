@@ -1,7 +1,6 @@
 // +page.server.ts
 import * as auth from '$lib/server/auth';
-import { fail, redirect } from '@sveltejs/kit';
-import { encodeBase32LowerCase } from '@oslojs/encoding';
+import { fail } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
@@ -19,6 +18,7 @@ import { m } from '$lib/paraglide/messages';
 import { generateDeterministicSlug } from '$lib/utils/random';
 import { AuthTab } from '$lib/enums/auth-tab';
 import { hashPassword, verifyPassword } from '$lib/server/password';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
 
 export const load: PageServerLoad = async (event: RequestEvent) => {
 	// Retorna o usuário quando houver sessão ativa, caso contrário retorna {}.
@@ -52,8 +52,9 @@ export const actions: Actions = {
 		if (!existingUser) {
 			// marca erro genérico (não vaze info) e retorna o form
 			form.valid = false;
-			form.errors?.username?.push(m['errors.form.username.does-not-exist']());
+			form.errors?.username?.push(m['errors.form.auth.invalid_credentials']());
 
+      setFlash({ type: 'error', message: m['toast.login.error']() }, event.cookies);
 			return fail(400, { form });
 		}
 
@@ -62,8 +63,9 @@ export const actions: Actions = {
 
 		if (!validPassword) {
 			form.valid = false;
-			form.errors?.password?.push(m['errors.form.default.invalid']('Senha'));
+			form.errors?.password?.push(m['errors.form.auth.invalid_credentials']());
 
+      setFlash({ type: 'error', message: m['toast.login.error']() }, event.cookies);
 			return fail(400, { form });
 		}
 
@@ -73,7 +75,7 @@ export const actions: Actions = {
 		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 
 		// sucesso -> redireciona
-		throw redirect(302, '/');
+		redirect('/', { type: 'success', message: m['toast.login.success']() }, event.cookies);
 	},
 
 	// register: valida dados, verifica unicidade, hash e insere
@@ -81,6 +83,7 @@ export const actions: Actions = {
 		const form = await superValidate(event, zod4(registerSchema));
 
 		if (!form.valid) {
+      setFlash({ type: 'error', message: m['toast.register.error']() }, event.cookies);
 			return fail(400, { form });
 		}
 
@@ -92,6 +95,7 @@ export const actions: Actions = {
 			form.valid = false;
 			form.errors?.username?.push(m['errors.form.username.exists']());
 
+      setFlash({ type: 'error', message: m['toast.register.error']() }, event.cookies);
 			return fail(400, { form });
 		}
 
@@ -100,6 +104,7 @@ export const actions: Actions = {
 			form.valid = false;
 			form.errors?.email?.push(m['errors.form.email.exists']());
 
+      setFlash({ type: 'error', message: m['toast.register.error']() }, event.cookies);
 			return fail(400, { form });
 		}
 
@@ -107,7 +112,7 @@ export const actions: Actions = {
 		const passwordHash = await hashPassword(password);
 
 		// gera id do usuário (usa sua função generateUserId)
-		const userId = generateUserId();
+		const userId = auth.generateUserId();
 
 		try {
 			await db.insert(table.user).values({
@@ -128,12 +133,13 @@ export const actions: Actions = {
 
 			// retorna o form com erro genérico (evite vazar detalhes de erro do DB)
 			form.valid = false;
-			form.errors?._errors?.push('An error has occurred');
+			form.errors?._errors?.push(m['errors.form.default.error']());
 
+      setFlash({ type: 'error', message: m['toast.default.error']() }, event.cookies);
 			return fail(500, { form });
 		}
 
-		throw redirect(302, '/');
+		redirect('/', { type: 'success', message: m['toast.register.success']() }, event.cookies);
 	},
 
 	// logout (mantive sua implementação original)
@@ -145,13 +151,6 @@ export const actions: Actions = {
 		await auth.invalidateSession(event.locals.session.id);
 		auth.deleteSessionTokenCookie(event);
 
-		throw redirect(302, '/auth');
+		redirect('/', { type: 'success', message: m['toast.logout.success']() }, event.cookies);
 	}
 };
-
-/** Gera um ID do usuário com ~120 bits de entropia (base32 lower-case) */
-function generateUserId() {
-	const bytes = crypto.getRandomValues(new Uint8Array(15));
-	const id = encodeBase32LowerCase(bytes);
-	return id;
-}

@@ -9,6 +9,7 @@
 	import { page } from '$app/stores';
 	import { derived } from 'svelte/store';
 	import { m } from '$lib/paraglide/messages';
+    import ThemeToggle from '$lib/components/theme-toggle.svelte';
 
 	const titleize = (s: string) =>
 		decodeURIComponent(s)

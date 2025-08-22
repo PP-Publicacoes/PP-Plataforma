@@ -1,7 +1,7 @@
 import { redirect, type RequestEvent } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
-import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
+import { encodeBase32LowerCase, encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import type { PublicUser } from '$lib/types/public-user';
@@ -105,4 +105,10 @@ export function getUser(event: RequestEvent): PublicUser {
 
 export async function invalidateUserSessions(userId: string) {
   await db.delete(table.session).where(eq(table.session.userId, userId));
+}
+
+export function generateUserId() {
+	const bytes = crypto.getRandomValues(new Uint8Array(15));
+	const id = encodeBase32LowerCase(bytes);
+	return id;
 }

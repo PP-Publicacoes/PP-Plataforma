@@ -12,6 +12,9 @@
 	import { m } from '$lib/paraglide/messages.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { AuthTab } from '$lib/enums/auth-tab';
+	import { DELAY_MS } from '$lib/consts/forms';
+	import Loader2Icon from '@lucide/svelte/icons/loader-2';
+    import { createSubmittingToast } from '$lib/utils/submitting-toast';
 
 	let {
 		data
@@ -24,11 +27,30 @@
 	} = $props();
 
 	const loginForm = superForm(data.loginForm, {
-		validators: zod4Client(loginSchema)
+		validators: zod4Client(loginSchema),
+		delayMs: DELAY_MS,
 	});
+	const { delayed: loginDelayed, submitting: loginSubmitting } = loginForm;
 	const registerForm = superForm(data.registerForm, {
-		validators: zod4Client(registerSchema)
+		validators: zod4Client(registerSchema),
+		delayMs: DELAY_MS,
 	});
+	const { delayed: registerDelayed, submitting: registerSubmitting } = registerForm;
+
+  $effect(() => {
+    const loginController = createSubmittingToast(loginSubmitting, {
+      message: m['toast.login.loading'](),
+    });
+    const registerController = createSubmittingToast(registerSubmitting, {
+      message: m['toast.register.loading'](),
+    });
+
+    // cleanup quando o efeito é destruído (ex.: componente desmonta)
+    return () => {
+      registerController.dispose();
+      loginController.dispose();
+    };
+  });
 
 	const { form: loginFormData, enhance: enhanceLogin } = loginForm;
 	const { form: registerFormData, enhance: enhanceRegister } = registerForm;
@@ -39,6 +61,8 @@
 		<Tabs.Trigger value={AuthTab.login}>{m['auth_tab.login']()}</Tabs.Trigger>
 		<Tabs.Trigger value={AuthTab.register}>{m['auth_tab.register']()}</Tabs.Trigger>
 	</Tabs.List>
+
+	<!-- Login -->
 	<Tabs.Content value={AuthTab.login}>
 		<form method="POST" use:enhanceLogin action="?/{AuthTab.login}" class="flex flex-col gap-1">
 			<!-- Header -->
@@ -48,6 +72,7 @@
 					{m['login.description']()}
 				</p>
 			</div>
+
 			<!-- Username -->
 			<Form.Field form={loginForm} name="username">
 				<Form.Control>
@@ -77,8 +102,16 @@
 				<Form.Description>{m['login.password.description']()}</Form.Description>
 				<Form.FieldErrors />
 			</Form.Field>
+
 			<!-- Button -->
-			<Form.Button class="w-full">{m['auth_tab.login']()}</Form.Button>
+			<Form.Button class="w-full" disabled={$loginSubmitting}>
+				{#if $loginDelayed}
+					<Loader2Icon class="animate-spin" />
+				{:else}
+					{m['auth_tab.login']()}
+				{/if}
+			</Form.Button>
+
 			<!-- Footer -->
 			<div class="mt-2 text-center text-sm">
 				{m['login.footer']()}
@@ -88,6 +121,8 @@
 			</div>
 		</form>
 	</Tabs.Content>
+
+	<!-- Register -->
 	<Tabs.Content value={AuthTab.register}>
 		<form
 			method="POST"
@@ -102,6 +137,7 @@
 					{m['register.description']()}
 				</p>
 			</div>
+
 			<!-- Username -->
 			<Form.Field form={registerForm} name="username">
 				<Form.Control>
@@ -150,8 +186,16 @@
 				<Form.Description>{m['register.confirm_password.description']()}</Form.Description>
 				<Form.FieldErrors />
 			</Form.Field>
+
 			<!-- Button -->
-			<Form.Button class="w-full">{m['auth_tab.register']()}</Form.Button>
+			<Form.Button class="w-full" disabled={$registerSubmitting}>
+				{#if $registerDelayed}
+					<Loader2Icon class="animate-spin" />
+				{:else}
+					{m['auth_tab.register']()}
+				{/if}
+			</Form.Button>
+
 			<!-- Footer -->
 			<div class="mt-2 text-center text-sm">
 				{m['register.footer']()}

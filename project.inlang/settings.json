@@ -8,7 +8,8 @@
 		"pathPattern": [
       "./messages/auth/{locale}.json",
       "./messages/sidebar/{locale}.json",
-      "./messages/routes/{locale}.json"
+      "./messages/routes/{locale}.json",
+      "./messages/toast/{locale}.json"
     ]
 	},
 	"baseLocale": "pt",
