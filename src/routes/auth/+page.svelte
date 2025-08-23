@@ -28,7 +28,7 @@
 	</div>
 	<div class="relative hidden bg-muted lg:block">
 		<img
-			src="/login.png"
+			src="/images/login.png"
 			alt="loginimg"
 			class="absolute inset-0 h-full w-full object-fill dark:brightness-[0.2] dark:grayscale"
 		/>

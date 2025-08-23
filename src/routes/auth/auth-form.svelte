@@ -14,7 +14,6 @@
 	import { AuthTab } from '$lib/enums/auth-tab';
 	import { DELAY_MS } from '$lib/consts/forms';
 	import Loader2Icon from '@lucide/svelte/icons/loader-2';
-    import { createSubmittingToast } from '$lib/utils/submitting-toast';
 
 	let {
 		data
@@ -36,21 +35,6 @@
 		delayMs: DELAY_MS,
 	});
 	const { delayed: registerDelayed, submitting: registerSubmitting } = registerForm;
-
-  $effect(() => {
-    const loginController = createSubmittingToast(loginSubmitting, {
-      message: m['toast.login.loading'](),
-    });
-    const registerController = createSubmittingToast(registerSubmitting, {
-      message: m['toast.register.loading'](),
-    });
-
-    // cleanup quando o efeito é destruído (ex.: componente desmonta)
-    return () => {
-      registerController.dispose();
-      loginController.dispose();
-    };
-  });
 
 	const { form: loginFormData, enhance: enhanceLogin } = loginForm;
 	const { form: registerFormData, enhance: enhanceRegister } = registerForm;
