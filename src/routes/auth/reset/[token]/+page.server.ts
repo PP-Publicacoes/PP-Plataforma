@@ -11,13 +11,13 @@ import { eq } from 'drizzle-orm';
 import * as auth from '$lib/server/auth';
 import { hashPassword } from '$lib/server/password';
 
-export const load: PageServerLoad = async (event) => {
+export const load: PageServerLoad = async event => {
   const token = event.params.token;
   // Não consome aqui; apenas mostra formulário
   if (!token) throw error(400, 'Token ausente');
 
   return {
-    form: await superValidate(zod4(resetPasswordSchema))
+    form: await superValidate(zod4(resetPasswordSchema)),
   };
 };
 
@@ -57,5 +57,5 @@ export const actions: Actions = {
 
     // Redireciona para home (ou /auth?t=login) com flash
     throw redirect(302, '/');
-  }
+  },
 };

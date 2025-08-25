@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import bcrypt from 'bcryptjs';
 
 // custo padrão; ajuste se precisar (10–12 é comum no edge)
 const ROUNDS = 12;

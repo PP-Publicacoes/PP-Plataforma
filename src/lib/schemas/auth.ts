@@ -21,7 +21,7 @@ const passwordWithPolicySchema = passwordSchema
 /** login */
 export const loginSchema = z.object({
   username: usernameSchema,
-  password: passwordSchema
+  password: passwordSchema,
 });
 
 export type LoginSchema = typeof loginSchema;
@@ -35,11 +35,11 @@ export const registerSchema = z
       .email({ error: m['errors.form.email.error']() })
       .nonempty({ error: m['errors.form.email.required']() }),
     password: passwordWithPolicySchema,
-    confirmPassword: z.string()
+    confirmPassword: z.string(),
   })
   .refine(data => data.password === data.confirmPassword, {
     error: m['errors.form.password.confirm_mismatch'](),
-    path: ['confirmPassword']
+    path: ['confirmPassword'],
   });
 
 export type RegisterSchema = typeof registerSchema;
@@ -48,7 +48,7 @@ export type RegisterInput = z.infer<typeof registerSchema>;
 export const forgotSchema = z.object({
   email: z
     .email({ error: m['errors.form.email.error']() })
-    .nonempty({ error: m['errors.form.email.required']() })
+    .nonempty({ error: m['errors.form.email.required']() }),
 });
 export type ForgotInput = z.infer<typeof forgotSchema>;
 
@@ -59,7 +59,7 @@ export const resetPasswordSchema = z
   })
   .refine(data => data.password === data.confirmPassword, {
     error: m['errors.form.password.confirm_mismatch'](),
-    path: ['confirmPassword']
+    path: ['confirmPassword'],
   });
 
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;

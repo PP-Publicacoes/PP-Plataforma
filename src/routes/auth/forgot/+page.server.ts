@@ -11,38 +11,38 @@ import { createPasswordResetToken } from '$lib/server/reset';
 import { sendPasswordResetEmail } from '$lib/server/email';
 
 export const load: PageServerLoad = async () => {
-	return {
-		form: await superValidate(zod4(forgotSchema))
-	};
+  return {
+    form: await superValidate(zod4(forgotSchema)),
+  };
 };
 
 export const actions: Actions = {
-	request: async (event: RequestEvent) => {
-		const form = await superValidate(event, zod4(forgotSchema));
-		if (!form.valid) return fail(400, { form });
+  request: async (event: RequestEvent) => {
+    const form = await superValidate(event, zod4(forgotSchema));
+    if (!form.valid) return fail(400, { form });
 
-		const { email } = form.data as ForgotInput;
+    const { email } = form.data as ForgotInput;
 
-		// Não revelar se e-mail existe: resposta sempre 200
-		const users = await db.select().from(table.user).where(eq(table.user.email, email));
-		const user = users.at(0);
+    // Não revelar se e-mail existe: resposta sempre 200
+    const users = await db.select().from(table.user).where(eq(table.user.email, email));
+    const user = users.at(0);
 
-		if (user) {
-			const { token, expiresAt } = await createPasswordResetToken(user.id, {
-				ip: event.getClientAddress?.() ?? undefined,
-				userAgent: event.request.headers.get('user-agent') ?? undefined
-			});
+    if (user) {
+      const { token, expiresAt } = await createPasswordResetToken(user.id, {
+        ip: event.getClientAddress?.() ?? undefined,
+        userAgent: event.request.headers.get('user-agent') ?? undefined,
+      });
 
-			// Constrói URL absoluta
-			const origin = event.url.origin; // SvelteKit 2: confiável
-			const resetUrl = `${origin}/auth/reset/${token}`;
-			await sendPasswordResetEmail(email, resetUrl);
+      // Constrói URL absoluta
+      const origin = event.url.origin; // SvelteKit 2: confiável
+      const resetUrl = `${origin}/auth/reset/${token}`;
+      await sendPasswordResetEmail(email, resetUrl);
 
-			// Opcional: log/telemetria do expiresAt
-			void expiresAt;
-		}
+      // Opcional: log/telemetria do expiresAt
+      void expiresAt;
+    }
 
-		// Sempre aparentar sucesso
-		return { form, sent: true as const };
-	}
+    // Sempre aparentar sucesso
+    return { form, sent: true as const };
+  },
 };

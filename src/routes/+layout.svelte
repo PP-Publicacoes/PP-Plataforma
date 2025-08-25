@@ -6,10 +6,10 @@
   import { page } from '$app/state';
   import { toast } from 'svelte-sonner';
   import { ModeWatcher } from 'mode-watcher';
-    import ThemeToggle from '$lib/components/theme-toggle.svelte';
+  import ThemeToggle from '$lib/components/theme-toggle.svelte';
 
   const flash = getFlash(page, {
-    clearAfterMs: 5000
+    clearAfterMs: 5000,
   });
 
   $effect(() => {

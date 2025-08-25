@@ -1,5 +1,5 @@
-- [X] Clear sidebar nav user
-- [X] Random slug and avatar using dice bear -> decided to use robohash (simpler)
+- [x] Clear sidebar nav user
+- [x] Random slug and avatar using dice bear -> decided to use robohash (simpler)
 - [] Profile page
 - [] Clear sidebar items
 
