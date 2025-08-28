@@ -10,22 +10,6 @@ export const TipoEquipamento = {
 } as const;
 
 export type TipoEquipamento = (typeof TipoEquipamento)[keyof typeof TipoEquipamento];
-
-export const CategoriaArma = {
-  leve: 'armaLeve',
-  tatica: 'armaTatica',
-  pesada: 'armaPesada',
-} as const;
-
-export type CategoriaArma = (typeof CategoriaArma)[keyof typeof CategoriaArma];
-
-export const CategoriaProtecao = {
-  leve: 'protecaoLeve',
-  pesada: 'protecaoPesada',
-} as const;
-
-export type CategoriaProtecao = (typeof CategoriaProtecao)[keyof typeof CategoriaProtecao];
-
 export const CategoriaRitualistico = {
   componente: 'componente',
   catalisador: 'catalisador',
@@ -34,3 +18,4 @@ export const CategoriaRitualistico = {
 
 export type CategoriaRitualistico =
   (typeof CategoriaRitualistico)[keyof typeof CategoriaRitualistico];
+

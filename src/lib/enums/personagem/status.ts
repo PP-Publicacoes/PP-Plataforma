@@ -11,7 +11,7 @@ export const StatusModificavel = {
   esperanca: Status.esperanca,
 } as const;
 
-export const StatusReferencia = {
+export const StatusReferenciavel = {
   medo: Status.medo,
   nivel: Status.nivel,
   patente: Status.patente,
@@ -19,4 +19,4 @@ export const StatusReferencia = {
 
 export type Status = (typeof Status)[keyof typeof Status];
 export type StatusModificavel = (typeof StatusModificavel)[keyof typeof StatusModificavel];
-export type StatusReferencia = (typeof StatusReferencia)[keyof typeof StatusReferencia];
+export type StatusReferenciavel = (typeof StatusReferenciavel)[keyof typeof StatusReferenciavel];

@@ -1,12 +1,11 @@
-import { Atributo } from '$lib/enums/atributo';
-import { TipoEquipamento } from '$lib/enums/equipamento';
-import { GrauTreinamento } from '$lib/enums/pericias';
-import { Proficiencia } from '$lib/enums/proficiencia';
+import { TipoEquipamento } from '$lib/enums/equipamento/equipamento';
+import { GrauTreinamento } from '$lib/enums/personagem/pericias';
 import { z } from 'zod/v4';
-import { preRequisitoSchema } from './geral';
-import { Patente } from '$lib/enums/patente';
-import { Status } from '$lib/enums/status';
 import { poderSchema } from './poderes';
+import { Status } from '$lib/enums/personagem/status';
+import { Patente } from '$lib/enums/personagem/patente';
+import { Atributo } from '$lib/enums/personagem/atributo';
+import { Proficiencia } from '$lib/enums/equipamento/proficiencia';
 
 export const statusScheam = z.object({
   [Status.vida]: z.number().min(0),
@@ -26,16 +25,15 @@ export const atributoSchema = z.object({
 });
 
 export const bonusSchema = z.object({
-  treinamento: z.enum(GrauTreinamento),
   [TipoEquipamento.vestimenta]: z.number(),
   [TipoEquipamento.utensilio]: z.number(),
+  treinamento: z.enum(GrauTreinamento),
   outro: z.number(),
 });
 
 export const periciaSchema = z.object({
   atributo: z.enum(Atributo),
   bonus: bonusSchema,
-  preRequisito: preRequisitoSchema,
   penalidadeCarga: z.boolean().default(false),
   somenteTreinado: z.boolean().default(false),
 });

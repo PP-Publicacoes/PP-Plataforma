@@ -8,12 +8,13 @@ export const BonusDefesa = {
 
 export const Reducao = BonusDefesa;
 
-export const TipoArmadura = {
-  nenhuma: 'nenhuma',
-  media: 'media',
-  pesada: 'pesada',
+export type BonusDefesa = (typeof BonusDefesa)[keyof typeof BonusDefesa];
+export type Reducao = BonusDefesa;
+
+export const CategoriaProtecao = {
+  leve: 'protecaoLeve',
+  pesada: 'protecaoPesada',
 } as const;
 
-export type BonusDefesa = (typeof BonusDefesa)[keyof typeof BonusDefesa];
-export type TipoArmadura = (typeof TipoArmadura)[keyof typeof TipoArmadura];
-export type Reducao = BonusDefesa;
+export type CategoriaProtecao = (typeof CategoriaProtecao)[keyof typeof CategoriaProtecao];
+
