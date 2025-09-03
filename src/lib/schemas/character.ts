@@ -1,11 +1,11 @@
-import { TipoEquipamento } from '$lib/enums/equipamento/equipamento';
-import { GrauTreinamento } from '$lib/enums/personagem/pericias';
+import { GrauTreinamento } from '$lib/enums/character/pericias';
 import { z } from 'zod/v4';
-import { poderSchema } from './poderes';
-import { Status } from '$lib/enums/personagem/status';
-import { Patente } from '$lib/enums/personagem/patente';
-import { Atributo } from '$lib/enums/personagem/atributo';
-import { Proficiencia } from '$lib/enums/equipamento/proficiencia';
+import { poderSchema } from './powers';
+import { Status } from '$lib/enums/character/status';
+import { Patente } from '$lib/enums/character/patente';
+import { Atributo } from '$lib/enums/character/atributo';
+import { TipoEquipamento } from '$lib/enums/equipment/equipment';
+import { Proficiencia } from '$lib/enums/equipment/proficiency';
 
 export const statusScheam = z.object({
   [Status.vida]: z.number().min(0),
@@ -39,6 +39,7 @@ export const periciaSchema = z.object({
 });
 
 export const personagemSchema = z.object({
+  userId: z.string(),
   status: statusScheam,
   carga: z.number().min(1),
   proficiencias: z.enum(Proficiencia).array(),

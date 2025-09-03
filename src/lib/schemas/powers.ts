@@ -1,14 +1,13 @@
 import { z } from 'zod/v4';
-import { TipoPoder } from '$lib/enums/poder/poder';
-import { GrauTreinamento, Pericia } from '$lib/enums/personagem/pericias';
-import { StatusModificavel, StatusReferenciavel } from '$lib/enums/personagem/status';
-import { BonusDefesa, Reducao } from '$lib/enums/equipamento/defesa';
-import { TipoArma } from '$lib/enums/equipamento/arma';
-import { Atributo } from '$lib/enums/personagem/atributo';
-import { TipoEquipamento } from '$lib/enums/equipamento/equipamento';
-import { Proficiencia } from '$lib/enums/equipamento/proficiencia';
-import { GrauAfinidade, Manifestacao } from '$lib/enums/paranormal/manifestacao';
-import { TipoDano } from '$lib/enums/rolagem/dano';
+import { GrauTreinamento, Pericia } from '$lib/enums/character/pericias';
+import { StatusModificavel, StatusReferenciavel } from '$lib/enums/character/status';
+import { Atributo } from '$lib/enums/character/atributo';
+import { TipoPoder } from '$lib/enums/power/power';
+import { BonusDefesa, Reducao } from '$lib/enums/equipment/defense';
+import { TipoDano } from '$lib/enums/roll/damage';
+import { TipoArma } from '$lib/enums/equipment/weapon';
+import { Proficiencia } from '$lib/enums/equipment/proficiency';
+import { GrauAfinidade, Assombracao } from '$lib/enums/fear/haunting';
 
 /*
 Poderes escaláveis possuem duas partes principais:
@@ -104,7 +103,7 @@ export const requerimentosSchema = z.object({
     .optional(),
   proficiencia: z.enum(Proficiencia).array(),
   afinidade: z.object({
-    manifestacao: z.enum(Manifestacao),
+    manifestacao: z.enum(Assombracao),
     grau: z.enum(GrauAfinidade),
   }),
 });
