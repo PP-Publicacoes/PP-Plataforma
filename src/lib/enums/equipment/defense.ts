@@ -17,4 +17,3 @@ export const CategoriaProtecao = {
 } as const;
 
 export type CategoriaProtecao = (typeof CategoriaProtecao)[keyof typeof CategoriaProtecao];
-

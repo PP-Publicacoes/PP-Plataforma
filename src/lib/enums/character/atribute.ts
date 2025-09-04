@@ -8,4 +8,3 @@ export const Atributo = {
 } as const;
 
 export type Atributo = (typeof Atributo)[keyof typeof Atributo];
-

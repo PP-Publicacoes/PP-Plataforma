@@ -1,7 +1,8 @@
 import { relations } from 'drizzle-orm';
 import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
+import { personagens } from './character';
 
-export const user = sqliteTable('user', {
+export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
   age: integer('age'),
   username: text('username').notNull().unique(),
@@ -10,19 +11,15 @@ export const user = sqliteTable('user', {
   passwordHash: text('password_hash').notNull(),
 });
 
-export const session = sqliteTable('session', {
+export const sessions = sqliteTable('sessions', {
   id: text('id').primaryKey(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id),
+  userId: text('user_id').notNull(),
   expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
 });
 
-export const passwordResetToken = sqliteTable('password_reset_token', {
+export const passwordResetTokens = sqliteTable('password_reset_tokens', {
   id: text('id').primaryKey(), // ex: base32 ou uuid
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull(),
   tokenHash: text('token_hash').notNull(), // sha256(token) em base64url
   createdAt: integer('created_at').notNull(), // Date.now()
   expiresAt: integer('expires_at').notNull(), // Date.now() + 15*60*1000
@@ -31,11 +28,21 @@ export const passwordResetToken = sqliteTable('password_reset_token', {
   userAgent: text('user_agent'),
 });
 
-export const passwordResetTokenRelations = relations(passwordResetToken, ({ one }) => ({
-  user: one(user, { fields: [passwordResetToken.userId], references: [user.id] }),
+export const usersRelations = relations(users, ({ many }) => ({
+  passwordResetTokens: many(passwordResetTokens),
+  personagens: many(personagens),
+  sessions: many(sessions),
 }));
 
-export type User = typeof user.$inferSelect;
-export type Session = typeof session.$inferSelect;
-export type UserInsert = typeof user.$inferInsert;
-export type SessionInsert = typeof session.$inferInsert;
+export const passwordResetTokenRelations = relations(passwordResetTokens, ({ one }) => ({
+  user: one(users, { fields: [passwordResetTokens.userId], references: [users.id] }),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, { fields: [sessions.userId], references: [users.id] }),
+}));
+
+export type User = typeof users.$inferSelect;
+export type Session = typeof sessions.$inferSelect;
+export type UserInsert = typeof users.$inferInsert;
+export type SessionInsert = typeof sessions.$inferInsert;

@@ -18,4 +18,3 @@ export const CategoriaRitualistico = {
 
 export type CategoriaRitualistico =
   (typeof CategoriaRitualistico)[keyof typeof CategoriaRitualistico];
-

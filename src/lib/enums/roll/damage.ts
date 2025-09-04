@@ -2,7 +2,7 @@
 
 export const TipoDano = {
   perfuracao: 'perfuracao',
-  mental: 'mental'
+  mental: 'mental',
 } as const;
 
 export type TipoDano = (typeof TipoDano)[keyof typeof TipoDano];
