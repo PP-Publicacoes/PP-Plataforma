@@ -4,11 +4,11 @@ import type { Actions, PageServerLoad } from './$types';
 import type { RequestEvent } from '@sveltejs/kit';
 import { fail } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { forgotSchema, type ForgotInput } from '$lib/schemas/auth';
 import { createPasswordResetToken } from '$lib/server/reset';
 import { sendPasswordResetEmail } from '$lib/server/email';
+import { users } from '$lib/server/db/schema/auth';
 
 export const load: PageServerLoad = async () => {
   return {
@@ -24,8 +24,8 @@ export const actions: Actions = {
     const { email } = form.data as ForgotInput;
 
     // Não revelar se e-mail existe: resposta sempre 200
-    const users = await db.select().from(table.user).where(eq(table.user.email, email));
-    const user = users.at(0);
+    const correspondingUsers = await db.select().from(users).where(eq(users.email, email));
+    const user = correspondingUsers.at(0);
 
     if (user) {
       const { token, expiresAt } = await createPasswordResetToken(user.id, {

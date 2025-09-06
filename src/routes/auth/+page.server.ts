@@ -3,7 +3,6 @@ import * as auth from '$lib/server/auth';
 import { fail } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
 import type { Actions, PageServerLoad } from './$types';
 import type { RequestEvent } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
@@ -19,6 +18,7 @@ import { generateDeterministicSlug } from '$lib/utils/random';
 import { AuthTab } from '$lib/enums/auth-tab';
 import { hashPassword, verifyPassword } from '$lib/server/password';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
+import { users } from '$lib/server/db/schema/auth';
 
 export const load: PageServerLoad = async (event: RequestEvent) => {
   // Retorna o usuário quando houver sessão ativa, caso contrário retorna {}.
@@ -46,7 +46,7 @@ export const actions: Actions = {
     const { username, password } = form.data as LoginInput;
 
     // busca usuário
-    const results = await db.select().from(table.user).where(eq(table.user.username, username));
+    const results = await db.select().from(users).where(eq(users.username, username));
     const existingUser = results.at(0);
 
     if (!existingUser) {
@@ -90,7 +90,7 @@ export const actions: Actions = {
     const { username, password, email } = form.data as RegisterInput;
 
     // verifica se username ou email já existem
-    const byUsername = await db.select().from(table.user).where(eq(table.user.username, username));
+    const byUsername = await db.select().from(users).where(eq(users.username, username));
     if (byUsername.length > 0) {
       form.valid = false;
       form.errors?.username?.push(m['errors.form.username.exists']());
@@ -99,7 +99,7 @@ export const actions: Actions = {
       return fail(400, { form });
     }
 
-    const byEmail = await db.select().from(table.user).where(eq(table.user.email, email));
+    const byEmail = await db.select().from(users).where(eq(users.email, email));
     if (byEmail.length > 0) {
       form.valid = false;
       form.errors?.email?.push(m['errors.form.email.exists']());
@@ -115,7 +115,7 @@ export const actions: Actions = {
     const userId = auth.generateUserId();
 
     try {
-      await db.insert(table.user).values({
+      await db.insert(users).values({
         id: userId,
         username,
         email,

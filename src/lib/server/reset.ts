@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
 import { eq, and, isNull } from 'drizzle-orm';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
+import { passwordResetTokens } from './db/schema/auth';
 
 function base64url(bytes: Uint8Array) {
   return Buffer.from(bytes)
@@ -36,7 +36,7 @@ export async function createPasswordResetToken(
   const idBytes = crypto.getRandomValues(new Uint8Array(10));
   const id = encodeBase32LowerCase(idBytes);
 
-  await db.insert(table.passwordResetToken).values({
+  await db.insert(passwordResetTokens).values({
     id,
     userId,
     tokenHash,
@@ -56,13 +56,8 @@ export async function consumePasswordResetToken(token: string) {
 
   const rows = await db
     .select()
-    .from(table.passwordResetToken)
-    .where(
-      and(
-        eq(table.passwordResetToken.tokenHash, tokenHash),
-        isNull(table.passwordResetToken.usedAt),
-      ),
-    );
+    .from(passwordResetTokens)
+    .where(and(eq(passwordResetTokens.tokenHash, tokenHash), isNull(passwordResetTokens.usedAt)));
 
   const rec = rows.at(0);
   if (!rec) return { ok: false as const, reason: 'INVALID' };
@@ -70,9 +65,9 @@ export async function consumePasswordResetToken(token: string) {
 
   // marca como usado (single-use)
   await db
-    .update(table.passwordResetToken)
+    .update(passwordResetTokens)
     .set({ usedAt: now })
-    .where(eq(table.passwordResetToken.id, rec.id));
+    .where(eq(passwordResetTokens.id, rec.id));
 
   return { ok: true as const, record: rec };
 }

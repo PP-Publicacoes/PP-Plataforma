@@ -3,8 +3,8 @@ import { eq } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase32LowerCase, encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
 import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
-import type { PublicUser } from '$lib/types/public-user';
+import { sessions, users, type Session, type SessionInsert } from './db/schema/auth';
+import type { PublicUser } from '$lib/types/auth';
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
@@ -17,21 +17,21 @@ export function generateSessionToken(): string {
   return token;
 }
 
-export async function createSession(token: string, userId: string): Promise<table.Session> {
+export async function createSession(token: string, userId: string): Promise<Session> {
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 
-  const session: table.Session = {
+  const session: SessionInsert = {
     id: sessionId,
     userId,
     expiresAt: new Date(Date.now() + DAY_IN_MS * 30),
   };
 
-  await db.insert(table.session).values(session);
+  await db.insert(sessions).values(session);
   return session;
 }
 
 export async function validateSessionToken(token: string): Promise<{
-  session: table.Session | null;
+  session: Session | null;
   user: PublicUser;
 }> {
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
@@ -40,17 +40,17 @@ export async function validateSessionToken(token: string): Promise<{
     .select({
       // Adjust user table here to tweak returned data
       user: {
-        id: table.user.id,
-        username: table.user.username,
-        age: table.user.age,
-        email: table.user.email,
-        slug: table.user.slug,
+        id: users.id,
+        username: users.username,
+        age: users.age,
+        email: users.email,
+        slug: users.slug,
       },
-      session: table.session,
+      session: sessions,
     })
-    .from(table.session)
-    .innerJoin(table.user, eq(table.session.userId, table.user.id))
-    .where(eq(table.session.id, sessionId));
+    .from(sessions)
+    .innerJoin(users, eq(sessions.userId, users.id))
+    .where(eq(sessions.id, sessionId));
 
   if (!result) {
     return { session: null, user: null };
@@ -60,7 +60,7 @@ export async function validateSessionToken(token: string): Promise<{
   const sessionExpired = Date.now() >= session.expiresAt.getTime();
 
   if (sessionExpired) {
-    await db.delete(table.session).where(eq(table.session.id, session.id));
+    await db.delete(sessions).where(eq(sessions.id, session.id));
     return { session: null, user: null };
   }
 
@@ -69,9 +69,9 @@ export async function validateSessionToken(token: string): Promise<{
   if (renewSession) {
     session.expiresAt = new Date(Date.now() + DAY_IN_MS * 30);
     await db
-      .update(table.session)
+      .update(sessions)
       .set({ expiresAt: session.expiresAt })
-      .where(eq(table.session.id, session.id));
+      .where(eq(sessions.id, session.id));
   }
 
   return { session, user };
@@ -80,7 +80,7 @@ export async function validateSessionToken(token: string): Promise<{
 export type SessionValidationResult = Awaited<ReturnType<typeof validateSessionToken>>;
 
 export async function invalidateSession(sessionId: string) {
-  await db.delete(table.session).where(eq(table.session.id, sessionId));
+  await db.delete(sessions).where(eq(sessions.id, sessionId));
 }
 
 export function setSessionTokenCookie(event: RequestEvent, token: string, expiresAt: Date) {
@@ -104,7 +104,7 @@ export function getUser(event: RequestEvent): PublicUser {
 }
 
 export async function invalidateUserSessions(userId: string) {
-  await db.delete(table.session).where(eq(table.session.userId, userId));
+  await db.delete(sessions).where(eq(sessions.userId, userId));
 }
 
 export function generateUserId() {

@@ -6,10 +6,10 @@ import { fail, redirect, error } from '@sveltejs/kit';
 import { resetPasswordSchema, type ResetPasswordInput } from '$lib/schemas/auth';
 import { consumePasswordResetToken } from '$lib/server/reset';
 import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import * as auth from '$lib/server/auth';
 import { hashPassword } from '$lib/server/password';
+import { users } from '$lib/server/db/schema/auth';
 
 export const load: PageServerLoad = async event => {
   const token = event.params.token;
@@ -45,7 +45,7 @@ export const actions: Actions = {
     const { password } = form.data as ResetPasswordInput;
     const passwordHash = await hashPassword(password);
 
-    await db.update(table.user).set({ passwordHash }).where(eq(table.user.id, userId));
+    await db.update(users).set({ passwordHash }).where(eq(users.id, userId));
 
     // Segurança extra: invalida todas as sessões anteriores desse usuário
     await auth.invalidateUserSessions(userId);
