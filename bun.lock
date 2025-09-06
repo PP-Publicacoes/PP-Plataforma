@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "teste",
+      "name": "pp-plataforma",
       "dependencies": {
         "@inlang/paraglide-js": "^2.0.0",
         "@libsql/client": "^0.14.0",
