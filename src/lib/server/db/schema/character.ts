@@ -1,8 +1,5 @@
-import type { GrauTreinamento } from '$lib/enums/character/skills';
-import type { TipoEquipamento } from '$lib/enums/equipment/equipment';
 import { relations } from 'drizzle-orm';
 import { sqliteTable, text, integer, primaryKey } from 'drizzle-orm/sqlite-core';
-import { createSelectSchema } from 'drizzle-zod';
 import { users } from './auth';
 import { valuesToTuple } from '$lib/utils/enum-utils';
 import { Patente } from '$lib/enums/character/patent';

@@ -1,0 +1,1 @@
+- [] mudar algumas coisas para um model, ao invés de enum
