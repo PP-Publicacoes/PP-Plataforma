@@ -1,8 +1,6 @@
-import { relations, sql } from 'drizzle-orm';
+import { relations } from 'drizzle-orm';
 import { integer, primaryKey, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
 import { users } from './auth';
-import { System } from '$lib/enums/table/system';
-import { valuesToTuple } from '$lib/utils/enum-utils';
 
 export const communities = sqliteTable('communities', {
   id: text('id').primaryKey(),
@@ -10,7 +8,7 @@ export const communities = sqliteTable('communities', {
   description: text('description').notNull(),
   slug: text('slug').unique(),
   creatorId: text('creator_id').notNull(),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 });
 
 export const members = sqliteTable(
@@ -21,7 +19,7 @@ export const members = sqliteTable(
     communityId: text('community_id').notNull(),
     nickname: text('nickname').notNull(),
     roleId: text('role_id').notNull(),
-    joinedAt: integer('joined_at', { mode: 'timestamp' }).default(sql`(unixepoch())`), // DEFAULT em segundos,
+    joinedAt: integer('joined_at', { mode: 'timestamp' }).notNull(),
   },
   t => [unique().on(t.communityId, t.userId)],
 );
@@ -41,17 +39,31 @@ export const tables = sqliteTable('tables', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   description: text('description').notNull(),
-  system: text('system', { enum: valuesToTuple(System) }).notNull(),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  systemId: text('system_id').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 });
 
-export const tablesRelations = relations(tables, ({ many }) => ({
+export const systems = sqliteTable('systems', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description').notNull(),
+});
+
+export const systemsRelations = relations(systems, ({ many }) => ({
+  tables: many(tables),
+}));
+
+export const tablesRelations = relations(tables, ({ many, one }) => ({
   tablesToGenres: many(tablesToGenres),
+  system: one(systems, {
+    fields: [tables.systemId],
+    references: [systems.id],
+  }),
 }));
 
 export const genres = sqliteTable('genres', {
   id: text('id').primaryKey(),
-  name: text('text').primaryKey(),
+  name: text('text').notNull(),
 });
 
 export const genresRelations = relations(genres, ({ many }) => ({
@@ -98,19 +110,6 @@ export const membersRelations = relations(members, ({ many, one }) => ({
     references: [roles.id],
   }),
 }));
-
-export const usersToMembers = sqliteTable(
-  'users_to_members',
-  {
-    userId: text('user_id')
-      .notNull()
-      .references(() => users.id),
-    memberId: text('member_id')
-      .notNull()
-      .references(() => members.id),
-  },
-  t => [primaryKey({ columns: [t.userId, t.memberId] })],
-);
 
 export const membersToCommunities = sqliteTable(
   'members_to_communities',

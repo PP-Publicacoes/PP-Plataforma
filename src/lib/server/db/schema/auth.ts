@@ -1,16 +1,17 @@
-import { relations, sql } from 'drizzle-orm';
+import { relations } from 'drizzle-orm';
 import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
-import { personagens } from './character';
-import { usersToMembers } from './table';
+import { members } from './table';
+import { characters } from './character';
 
 export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
   age: integer('age'),
   username: text('username').notNull().unique(),
   email: text('email').notNull().unique(),
+  bio: text('bio'),
   slug: text('slug').notNull().unique(),
   passwordHash: text('password_hash').notNull(),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 });
 
 export const sessions = sqliteTable('sessions', {
@@ -23,8 +24,8 @@ export const passwordResetTokens = sqliteTable('password_reset_tokens', {
   id: text('id').primaryKey(), // ex: base32 ou uuid
   userId: text('user_id').notNull(),
   tokenHash: text('token_hash').notNull(), // sha256(token) em base64url
-  createdAt: integer('created_at').notNull(), // Date.now()
-  expiresAt: integer('expires_at').notNull(), // Date.now() + 15*60*1000
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
   usedAt: integer('used_at'), // null até usar
   ip: text('ip'),
   userAgent: text('user_agent'),
@@ -32,9 +33,9 @@ export const passwordResetTokens = sqliteTable('password_reset_tokens', {
 
 export const usersRelations = relations(users, ({ many }) => ({
   passwordResetTokens: many(passwordResetTokens),
-  personagens: many(personagens),
+  characters: many(characters),
   sessions: many(sessions),
-  usersToMembers: many(usersToMembers),
+  members: many(members),
 }));
 
 export const passwordResetTokenRelations = relations(passwordResetTokens, ({ one }) => ({

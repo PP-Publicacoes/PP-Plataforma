@@ -7,10 +7,10 @@ export const Pericia = {
 export type Pericia = (typeof Pericia)[keyof typeof Pericia];
 
 export const GrauTreinamento = {
-  parcial: 1,
-  normal: 2,
-  veterano: 4,
-  expert: 6,
+  parcial: 'parcial',
+  normal: 'normal',
+  veterano: 'veterano',
+  expert: 'expert',
 } as const;
 
 export type GrauTreinamento = (typeof GrauTreinamento)[keyof typeof GrauTreinamento];

@@ -1,0 +1,3 @@
+- [O] mudar algumas coisas para um model, ao invés de enum
+- [] revisar a parte do sistema e ver se tá show
+- [] criar a parte de utensílios/vestimenta

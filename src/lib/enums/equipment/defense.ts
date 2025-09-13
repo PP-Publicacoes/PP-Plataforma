@@ -1,9 +1,9 @@
 export const BonusDefesa = {
-  I: 2,
-  II: 4,
-  III: 6,
-  IV: 8,
-  V: 10,
+  I: 'I',
+  II: 'II',
+  III: 'III',
+  IV: 'IV',
+  V: 'V',
 } as const;
 
 export const Reducao = BonusDefesa;
