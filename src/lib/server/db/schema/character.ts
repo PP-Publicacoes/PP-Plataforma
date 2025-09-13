@@ -46,16 +46,20 @@ export const personagensRelations = relations(personagens, ({ many, one }) => ({
     fields: [personagens.userId],
     references: [users.id],
   }),
-  personagensParaPericias: many(personagemParaPericias),
-  personagemParaPoderes: many(personagemParaPoderes),
+  personagensToPericias: many(personagensToPericias),
+  personagensToPoderes: many(personagensToPoderes),
 }));
 
 export const periciasRelations = relations(pericias, ({ many }) => ({
-  personagensParaPericias: many(personagemParaPericias),
+  personagensToPericias: many(personagensToPericias),
 }));
 
-export const personagemParaPericias = sqliteTable(
-  'personagens_para_pericias',
+export const poderesRelations = relations(poderes, ({ many }) => ({
+  personagensToPoderes: many(personagensToPoderes),
+}));
+
+export const personagensToPericias = sqliteTable(
+  'personagens_to_pericias',
   {
     personagemId: text('personagem_id')
       .notNull()
@@ -67,8 +71,8 @@ export const personagemParaPericias = sqliteTable(
   t => [primaryKey({ columns: [t.personagemId, t.periciaId] })],
 );
 
-export const personagemParaPoderes = sqliteTable(
-  'personagem_para_poderes',
+export const personagensToPoderes = sqliteTable(
+  'personagem_to_poderes',
   {
     personagemId: text('personagem_id')
       .notNull()

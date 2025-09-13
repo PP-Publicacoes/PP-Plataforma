@@ -1,6 +1,7 @@
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
 import { personagens } from './character';
+import { usersToMembers } from './table';
 
 export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
@@ -9,6 +10,7 @@ export const users = sqliteTable('users', {
   email: text('email').notNull().unique(),
   slug: text('slug').notNull().unique(),
   passwordHash: text('password_hash').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
 });
 
 export const sessions = sqliteTable('sessions', {
@@ -32,6 +34,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   passwordResetTokens: many(passwordResetTokens),
   personagens: many(personagens),
   sessions: many(sessions),
+  usersToMembers: many(usersToMembers),
 }));
 
 export const passwordResetTokenRelations = relations(passwordResetTokens, ({ one }) => ({
