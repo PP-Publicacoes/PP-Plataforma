@@ -16,17 +16,21 @@ export const users = sqliteTable('users', {
 
 export const sessions = sqliteTable('sessions', {
   id: text('id').primaryKey(),
-  userId: text('user_id').notNull(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id),
   expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
 });
 
 export const passwordResetTokens = sqliteTable('password_reset_tokens', {
-  id: text('id').primaryKey(), // ex: base32 ou uuid
-  userId: text('user_id').notNull(),
-  tokenHash: text('token_hash').notNull(), // sha256(token) em base64url
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id),
+  tokenHash: text('token_hash').notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
   expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
-  usedAt: integer('used_at'), // null até usar
+  usedAt: integer('used_at', { mode: 'timestamp' }),
   ip: text('ip'),
   userAgent: text('user_agent'),
 });

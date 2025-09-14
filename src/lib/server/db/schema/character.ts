@@ -1,38 +1,36 @@
 import { relations } from 'drizzle-orm';
 import { sqliteTable, text, integer, primaryKey } from 'drizzle-orm/sqlite-core';
 import { users } from './auth';
-import { Patente } from '../../../enums/character/patent';
-import { valuesToTuple } from '../../../utils/enum-utils';
 import { powers } from './power';
 
 // -------------------- tables --------------------
 
 export const attributes = sqliteTable('attributes', {
-  name: text('name').primaryKey().notNull(),
+  name: text('name').primaryKey(),
   description: text('description').notNull(),
 });
 
-export const skillTrainings = sqliteTable('skill_training', {
-  name: text('name').primaryKey().notNull(),
+export const skillLevels = sqliteTable('skill_levels', {
+  level: text('level').primaryKey(),
   bonus: integer('bonus').notNull(),
 });
 
-export const attributesSheet = sqliteTable('attributes_sheet', {
-  id: text('id').primaryKey().notNull(),
-  physical: integer('physical').notNull(),
-  dexterity: integer('dexterity').notNull(),
-  charisma: integer('charisma').notNull(),
-  lore: integer('lore').notNull(),
-  reasoning: integer('reasoning').notNull(),
-  wisdom: integer('wisdom').notNull(),
-});
-
-export const status = sqliteTable('status', {
-  id: text('id').primaryKey().notNull(),
+export const statusSheet = sqliteTable('status_sheet', {
+  id: text('id').primaryKey(),
+  characterId: text('character_id')
+    .notNull()
+    .references(() => characters.id),
   hp: integer('hp').notNull(),
   hope: integer('hope').notNull(),
   level: integer('level').notNull(),
   fear: integer('fear').notNull(),
+});
+
+export const ranks = sqliteTable('ranks', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description'),
+  proficiencyCredits: integer('proficiency_credits').notNull(),
 });
 
 export const characters = sqliteTable('characters', {
@@ -41,50 +39,60 @@ export const characters = sqliteTable('characters', {
     .notNull()
     .references(() => users.id),
 
-  attributesSheetId: text('attributes_sheet_id')
+  rankId: text('rank_id')
     .notNull()
-    .references(() => attributesSheet.id),
-  statusSheetId: text('status_sheet_id')
-    .notNull()
-    .references(() => status.id),
+    .references(() => ranks.id),
 
-  rank: text('rank', { enum: valuesToTuple(Patente) }).notNull(),
-
-  encumbrance: integer('encumbrance').notNull(),
+  loadCapacity: integer('load_capacity').notNull(),
   defense: integer('defense').notNull(),
 });
 
+// yes, we use rigid fields because, although there is an attribute dedicated table, it'll make things easier
+export const attributesSheet = sqliteTable('attributes_sheet', {
+  id: text('id').primaryKey(),
+  characterId: text('character_id')
+    .notNull()
+    .references(() => characters.id),
+  strength: integer('strength').notNull(),
+  dexterity: integer('dexterity').notNull(),
+  attention: integer('attention').notNull(),
+  study: integer('study').notNull(),
+  spirit: integer('spirit').notNull(),
+  charisma: integer('charisma').notNull(),
+});
+
 export const skills = sqliteTable('skills', {
-  name: text('name').primaryKey().notNull(),
+  name: text('name').primaryKey(),
   description: text('description').notNull(),
-  attribute: text('attribute').notNull(),
+  attributeName: text('attribute_name')
+    .notNull()
+    .references(() => attributes.name),
   loadPenalty: integer('load_penalty', { mode: 'boolean' }).notNull().default(false),
   trainedOnly: integer('trained_only', { mode: 'boolean' }).notNull().default(false),
 });
 
-export const bonusSkills = sqliteTable('bonus_skills', {
+export const skillBonuses = sqliteTable('skill_bonuses', {
   id: text('id').primaryKey(),
-  skillName: text('skillName').notNull(),
-  // dynamic column names from equipment enum kept as-is:
-  // [TipoEquipamento.utensilio]: integer(String(TipoEquipamento.utensilio)),
-  // [TipoEquipamento.vestimenta]: integer(String(TipoEquipamento.vestimenta)),
-  training: text('training'),
+  skillName: text('skill_name')
+    .notNull()
+    .references(() => skills.name),
+  skillLevel: text('skill_level').references(() => skillLevels.level),
   other: integer('other'),
 });
 
 // -------------------- join tables --------------------
 
-export const charactersToSkills = sqliteTable(
-  'characters_to_skills',
+export const charactersToSkillBonuses = sqliteTable(
+  'characters_to_skill_bonus',
   {
     characterId: text('character_id')
       .notNull()
       .references(() => characters.id),
-    skillName: text('skill_name')
+    skillBonusId: text('skill_bonus_id')
       .notNull()
-      .references(() => skills.name),
+      .references(() => skillBonuses.id),
   },
-  t => [primaryKey({ columns: [t.characterId, t.skillName] })],
+  t => [primaryKey({ columns: [t.characterId, t.skillBonusId] })],
 );
 
 export const charactersToPowers = sqliteTable(
@@ -106,15 +114,25 @@ export const attributesRelations = relations(attributes, ({ many }) => ({
   skills: many(skills),
 }));
 
-export const skillTrainingsRelations = relations(skillTrainings, ({ many }) => ({
-  bonusSkills: many(bonusSkills),
+export const skillLevelsRelations = relations(skillLevels, ({ many }) => ({
+  skillBonuses: many(skillBonuses),
 }));
 
-export const attributesSheetRelations = relations(attributesSheet, ({ many }) => ({
-  characters: many(characters),
+export const attributesSheetRelations = relations(attributesSheet, ({ one }) => ({
+  character: one(characters, {
+    fields: [attributesSheet.characterId],
+    references: [characters.id],
+  }),
 }));
 
-export const statusRelations = relations(status, ({ many }) => ({
+export const statusSheetRelations = relations(statusSheet, ({ one }) => ({
+  character: one(characters, {
+    fields: [statusSheet.characterId],
+    references: [characters.id],
+  }),
+}));
+
+export const ranksRelations = relations(ranks, ({ many }) => ({
   characters: many(characters),
 }));
 
@@ -123,46 +141,45 @@ export const charactersRelations = relations(characters, ({ many, one }) => ({
     fields: [characters.userId],
     references: [users.id],
   }),
-  attributesSheet: one(attributesSheet, {
-    fields: [characters.attributesSheetId],
-    references: [attributesSheet.id],
+  attributesSheet: one(attributesSheet),
+  statusSheet: one(statusSheet),
+  rank: one(ranks, {
+    fields: [characters.rankId],
+    references: [ranks.id],
   }),
-  status: one(status, {
-    fields: [characters.statusSheetId],
-    references: [status.id],
-  }),
-  charactersToSkills: many(charactersToSkills),
+  charactersToSkillBonuses: many(charactersToSkillBonuses),
   charactersToPowers: many(charactersToPowers),
 }));
 
 export const skillsRelations = relations(skills, ({ many, one }) => ({
-  charactersToSkills: many(charactersToSkills),
-  bonus: many(bonusSkills),
+  charactersToSkills: many(charactersToSkillBonuses),
+  skillBonuses: many(skillBonuses),
   attribute: one(attributes, {
-    fields: [skills.attribute],
+    fields: [skills.attributeName],
     references: [attributes.name],
   }),
 }));
 
-export const bonusSkillsRelations = relations(bonusSkills, ({ one }) => ({
+export const skillBonusesRelations = relations(skillBonuses, ({ many, one }) => ({
   skill: one(skills, {
-    fields: [bonusSkills.skillName],
+    fields: [skillBonuses.skillName],
     references: [skills.name],
   }),
-  trainingLevel: one(skillTrainings, {
-    fields: [bonusSkills.training],
-    references: [skillTrainings.name],
+  skillLevel: one(skillLevels, {
+    fields: [skillBonuses.skillLevel],
+    references: [skillLevels.level],
   }),
+  charactersToSkillBonuses: many(charactersToSkillBonuses),
 }));
 
-export const charactersToSkillsRelations = relations(charactersToSkills, ({ one }) => ({
+export const charactersToSkillBonusRelations = relations(charactersToSkillBonuses, ({ one }) => ({
   character: one(characters, {
-    fields: [charactersToSkills.characterId],
+    fields: [charactersToSkillBonuses.characterId],
     references: [characters.id],
   }),
-  skill: one(skills, {
-    fields: [charactersToSkills.skillName],
-    references: [skills.name],
+  skillBonus: one(skillBonuses, {
+    fields: [charactersToSkillBonuses.skillBonusId],
+    references: [skillBonuses.id],
   }),
 }));
 

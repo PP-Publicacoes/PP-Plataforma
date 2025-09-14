@@ -2,9 +2,9 @@ import { StatusModificavel, StatusReferenciavel } from '$lib/enums/character/sta
 import { relations } from 'drizzle-orm';
 import { valuesToTuple } from '../../../utils/enum-utils';
 import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import { attributes, skills } from './character';
-import { damageTypes, proficiencies } from './equipment';
-import { hauntings } from './fear';
+import { attributes, skillLevels, skills } from './character';
+import { damageTypes, proficiencies, proficiencyLevels } from './equipment';
+import { affinityLevels, hauntings } from './fear';
 
 // -------------------- tables --------------------
 
@@ -12,77 +12,98 @@ export const powers = sqliteTable('powers', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   description: text('description').notNull(),
-  type: text('type').notNull(),
-  staticId: text('static_id'),
-  scalableId: text('scalable_id'),
-  requirementId: text('requirement_id'),
+  // typeName: text('type').notNull().references(() => powerTypes.name),
+  staticId: text('static_id').references(() => staticPowers.id),
+  scalableId: text('scalable_id').references(() => scalablePowers.id),
+  requirementId: text('requirement_id').references(() => powerRequirements.id),
 });
 
 export const powerRequirements = sqliteTable('power_requirements', {
-  id: text('id').primaryKey().notNull(),
-  powerAttributeRequirementId: text('power_requirement_attribute_id'),
-  powerSkillRequirementId: text('power_requirement_skill_id'),
-  powerAffinityRequirementId: text('power_requirement_affinity_id'),
-  powerProficiencyRequirementId: text('power_requirement_proficiency_id'),
-  powerPowerRequirementId: text('power_requirement_power_id'),
+  id: text('id').primaryKey(),
 });
 
 export const powerAttributeRequirements = sqliteTable(
   'power_attribute_requirements',
   {
-    powerRequirementId: text('power_requirement_id').notNull(),
-    attribute: text('attribute').notNull(),
+    powerRequirementId: text('power_requirement_id')
+      .notNull()
+      .references(() => powerRequirements.id),
+    attributeName: text('attribute_name')
+      .notNull()
+      .references(() => attributes.name),
     value: integer('value').notNull(),
   },
-  t => [primaryKey({ columns: [t.powerRequirementId, t.attribute] })],
+  t => [primaryKey({ columns: [t.powerRequirementId, t.attributeName] })],
 );
 
 export const powerSkillRequirements = sqliteTable(
   'power_skill_requirements',
   {
-    powerRequirementId: text('power_requirement_id').notNull(),
-    skill: text('skill').notNull(),
-    level: text('level').notNull(),
+    powerRequirementId: text('power_requirement_id')
+      .notNull()
+      .references(() => powerRequirements.id),
+    skillName: text('skill_name')
+      .notNull()
+      .references(() => skills.name),
+    skillLevel: text('skill_level')
+      .notNull()
+      .references(() => skillLevels.level),
   },
-  t => [primaryKey({ columns: [t.powerRequirementId, t.skill] })],
+  t => [primaryKey({ columns: [t.powerRequirementId, t.skillName] })],
 );
 
 export const powerAffinityRequirements = sqliteTable(
   'power_affinity_requirements',
   {
-    powerRequirementId: text('power_requirement_id').notNull(),
-    haunting: text('haunting').notNull(),
-    level: text('level').notNull(),
+    powerRequirementId: text('power_requirement_id')
+      .notNull()
+      .references(() => powerRequirements.id),
+    hauntingName: text('haunting_name')
+      .notNull()
+      .references(() => hauntings.name),
+    affinityLevel: text('affinity_level')
+      .notNull()
+      .references(() => affinityLevels.level),
   },
-  t => [primaryKey({ columns: [t.powerRequirementId, t.haunting] })],
+  t => [primaryKey({ columns: [t.powerRequirementId, t.hauntingName] })],
 );
 
 export const powerProficiencyRequirements = sqliteTable(
   'power_proficiency_requirements',
   {
-    powerRequirementId: text('power_requirement_id').notNull(),
-    proficiency: text('proficiency').notNull(),
-    level: text('level').notNull(),
+    powerRequirementId: text('power_requirement_id')
+      .notNull()
+      .references(() => powerRequirements.id),
+    proficiencyName: text('proficiency_name')
+      .notNull()
+      .references(() => proficiencies.name),
+    proficiencyLevel: text('proficiency_level')
+      .notNull()
+      .references(() => proficiencyLevels.level),
   },
-  t => [primaryKey({ columns: [t.powerRequirementId, t.proficiency] })],
+  t => [primaryKey({ columns: [t.powerRequirementId, t.proficiencyName] })],
 );
 
 export const powerPowerRequirements = sqliteTable(
   'power_power_requirements',
   {
-    powerRequirementId: text('power_requirement_id').notNull(),
-    powerId: text('power_id').notNull(),
+    powerRequirementId: text('power_requirement_id')
+      .notNull()
+      .references(() => powerRequirements.id),
+    powerId: text('power_id')
+      .notNull()
+      .references(() => powers.id),
   },
   t => [primaryKey({ columns: [t.powerRequirementId, t.powerId] })],
 );
 
-export const powerTypes = sqliteTable('power_types', {
-  type: text('type').primaryKey().notNull(),
-});
+// export const powerTypes = sqliteTable('power_types', {
+//   type: text('type').primaryKey(),
+// });
 
-export const defenseBonus = sqliteTable('defense_bonus', {
-  level: text('level').primaryKey().notNull(),
-  bonus: integer().notNull(),
+export const defenseBonusLevels = sqliteTable('defense_bonus_levels', {
+  level: text('level').primaryKey(),
+  bonus: integer('bonus').notNull(),
 });
 
 export const scalablePowers = sqliteTable('scalable_powers', {
@@ -95,36 +116,141 @@ export const scalablePowers = sqliteTable('scalable_powers', {
 
 export const staticPowers = sqliteTable('static_powers', {
   id: text('id').primaryKey(),
-  staticSkill: text('static_skill'),
-  defense: text('defense'),
-  reduction: text('reduction'),
-  staticDamage: text('static_damage'),
+  staticSkillId: text('static_skill_id').references(() => staticSkills.id),
+  defenseBonusLevel: text('defense_bonus_level').references(() => defenseBonusLevels.level),
+  staticDamageReductionId: text('static_damage_reduction_id').references(
+    () => staticDamageReductions.id,
+  ),
+  staticBonusDamageId: text('static_damage_id').references(() => staticBonusDamages.id),
 });
 
 export const staticSkills = sqliteTable('static_skills', {
   id: text('id').primaryKey(),
-  bonus: integer('bonus', { mode: 'boolean' }),
-  dice: integer('dice'),
+  skillName: text('skill_name')
+    .notNull()
+    .references(() => skills.name),
+  level: integer('level', { mode: 'boolean' }),
+  dices: integer('dices'),
 });
 
-export const reductionLevels = sqliteTable('reduction_levels', {
-  level: text('level').primaryKey().notNull(),
-  value: integer().notNull(),
+export const staticBonusDamages = sqliteTable('static_bonus_damages', {
+  id: text('id').primaryKey(),
+});
+
+export const proficiencyDamages = sqliteTable('proficiency_damages', {
+  id: text('id').primaryKey(),
+  proficiencyName: text('proficiency_name')
+    .notNull()
+    .references(() => proficiencies.name),
+  value: integer('value').notNull(),
+});
+
+export const typeDamages = sqliteTable('type_damages', {
+  id: text('id').primaryKey(),
+  damageTypeName: text('damage_type_name')
+    .notNull()
+    .references(() => damageTypes.name),
+  value: integer('value').notNull(),
+});
+
+export const staticDamageReductions = sqliteTable('static_damage_reductions', {
+  id: text('id').primaryKey(),
+});
+
+export const damageReductionLevels = sqliteTable('damage_reduction_levels', {
+  level: text('level').primaryKey(),
+  value: integer('value').notNull(),
 });
 
 export const damageReductions = sqliteTable('damage_reductions', {
-  id: text('id').primaryKey().notNull(),
-  damageType: text('damage_type').notNull(),
-  reductionLevel: text('reduction_level').notNull(),
+  id: text('id').primaryKey(),
+  damageTypeName: text('damage_type_name')
+    .notNull()
+    .references(() => damageTypes.name),
+  damageReductionLevel: text('damage_reduction_level')
+    .notNull()
+    .references(() => damageReductionLevels.level),
 });
+
+export const staticBonusDamagesToProficiencyDamages = sqliteTable(
+  'static_bonus_damages_to_proficiency_damages',
+  {
+    staticBonusDamageId: text('static_bonus_damage_id')
+      .notNull()
+      .references(() => staticBonusDamages.id),
+    proficiencyDamageId: text('proficiency_damage_id')
+      .notNull()
+      .references(() => proficiencyDamages.id),
+  },
+  t => [primaryKey({ columns: [t.staticBonusDamageId, t.proficiencyDamageId] })],
+);
+
+export const staticBonusDamagesToTypeDamages = sqliteTable(
+  'static_bonus_damages_to_type_damages',
+  {
+    staticBonusDamageId: text('static_bonus_damage_id')
+      .notNull()
+      .references(() => staticBonusDamages.id),
+    typeDamageId: text('type_damage_id')
+      .notNull()
+      .references(() => typeDamages.id),
+  },
+  t => [primaryKey({ columns: [t.staticBonusDamageId, t.typeDamageId] })],
+);
+
+export const staticDamageReductionsToDamageReductions = sqliteTable(
+  'static_damage_reductions_to_damage_reductions',
+  {
+    staticDamageReductionId: text('static_damage_reduction_id')
+      .notNull()
+      .references(() => staticDamageReductions.id),
+    damageReductionId: text('damage_reduction_id')
+      .notNull()
+      .references(() => damageReductions.id),
+  },
+  t => [primaryKey({ columns: [t.staticDamageReductionId, t.damageReductionId] })],
+);
 
 // -------------------- relations --------------------
 
-export const powersRelations = relations(powers, ({ one }) => ({
-  type: one(powerTypes, {
-    fields: [powers.type],
-    references: [powerTypes.type],
+export const staticBonusDamagesRelations = relations(staticBonusDamages, ({ many }) => ({
+  staticBonusDamagesToProficiencyDamages: many(staticBonusDamagesToProficiencyDamages),
+  staticBonusDamagesToTypeDamages: many(staticBonusDamagesToTypeDamages),
+}));
+
+export const proficiencyDamagesRelations = relations(proficiencyDamages, ({ many, one }) => ({
+  proficiency: one(proficiencies, {
+    fields: [proficiencyDamages.proficiencyName],
+    references: [proficiencies.name],
   }),
+  staticBonusDamagesToProficiencyDamages: many(staticBonusDamagesToProficiencyDamages),
+}));
+
+export const typeDamagesRelations = relations(typeDamages, ({ many, one }) => ({
+  damageType: one(damageTypes, {
+    fields: [typeDamages.damageTypeName],
+    references: [damageTypes.name],
+  }),
+  staticBonusDamagesToTypeDamages: many(staticBonusDamagesToTypeDamages),
+}));
+
+export const staticDamageReductionsRelations = relations(staticDamageReductions, ({ many }) => ({
+  staticDamageReductionsToDamageReductions: many(staticDamageReductionsToDamageReductions),
+}));
+
+export const damageReductionsRelations = relations(damageReductions, ({ one, many }) => ({
+  reductionLevel: one(damageReductionLevels, {
+    fields: [damageReductions.damageReductionLevel],
+    references: [damageReductionLevels.level],
+  }),
+  damageType: one(damageTypes, {
+    fields: [damageReductions.damageTypeName],
+    references: [damageTypes.name],
+  }),
+  staticDamageReductionsToDamageReductions: many(staticDamageReductionsToDamageReductions),
+}));
+
+export const powersRelations = relations(powers, ({ one }) => ({
   scalable: one(scalablePowers, {
     fields: [powers.scalableId],
     references: [scalablePowers.id],
@@ -156,7 +282,7 @@ export const powerAttributeRequirementsRelations = relations(
       references: [powerRequirements.id],
     }),
     attribute: one(attributes, {
-      fields: [powerAttributeRequirements.attribute],
+      fields: [powerAttributeRequirements.attributeName],
       references: [attributes.name],
     }),
   }),
@@ -167,7 +293,7 @@ export const powerSkillRequirementsRelations = relations(powerSkillRequirements,
     fields: [powerSkillRequirements.powerRequirementId],
     references: [powerRequirements.id],
   }),
-  skill: one(skills, { fields: [powerSkillRequirements.skill], references: [skills.name] }),
+  skill: one(skills, { fields: [powerSkillRequirements.skillName], references: [skills.name] }),
 }));
 
 export const powerAffinityRequirementsRelations = relations(
@@ -178,8 +304,12 @@ export const powerAffinityRequirementsRelations = relations(
       references: [powerRequirements.id],
     }),
     haunting: one(hauntings, {
-      fields: [powerAffinityRequirements.haunting],
+      fields: [powerAffinityRequirements.hauntingName],
       references: [hauntings.name],
+    }),
+    affinityLevel: one(affinityLevels, {
+      fields: [powerAffinityRequirements.affinityLevel],
+      references: [affinityLevels.level],
     }),
   }),
 );
@@ -192,8 +322,12 @@ export const powerProficiencyRequirementsRelations = relations(
       references: [powerRequirements.id],
     }),
     proficiency: one(proficiencies, {
-      fields: [powerProficiencyRequirements.powerRequirementId],
+      fields: [powerProficiencyRequirements.proficiencyName],
       references: [proficiencies.name],
+    }),
+    proficiencyLevel: one(proficiencyLevels, {
+      fields: [powerProficiencyRequirements.proficiencyLevel],
+      references: [proficiencyLevels.level],
     }),
   }),
 );
@@ -209,9 +343,9 @@ export const powerPowerRequirementsRelations = relations(powerPowerRequirements,
   }),
 }));
 
-export const powerTypesRelations = relations(powerTypes, ({ many }) => ({
-  powers: many(powers),
-}));
+// export const powerTypesRelations = relations(powerTypes, ({ many }) => ({
+//   powers: many(powers),
+// }));
 
 export const scalablePowersRelations = relations(scalablePowers, ({ many }) => ({
   powers: many(powers),
@@ -220,39 +354,70 @@ export const scalablePowersRelations = relations(scalablePowers, ({ many }) => (
 export const staticPowersRelations = relations(staticPowers, ({ many, one }) => ({
   powers: many(powers),
   staticSkill: one(staticSkills, {
-    fields: [staticPowers.staticSkill],
+    fields: [staticPowers.staticSkillId],
     references: [staticSkills.id],
   }),
-  reduction: one(reductionLevels, {
-    fields: [staticPowers.reduction],
-    references: [reductionLevels.level],
+  staticDamageReduction: one(staticDamageReductions, {
+    fields: [staticPowers.staticDamageReductionId],
+    references: [staticDamageReductions.id],
   }),
-  staticDamage: one(damageReductions, {
-    fields: [staticPowers.staticDamage],
-    references: [damageReductions.id],
+  staticBonusDamage: one(staticBonusDamages, {
+    fields: [staticPowers.staticBonusDamageId],
+    references: [staticBonusDamages.id],
   }),
-  defense: one(defenseBonus, {
-    fields: [staticPowers.defense],
-    references: [defenseBonus.level],
-  })
+  defenseBonusLevel: one(defenseBonusLevels, {
+    fields: [staticPowers.defenseBonusLevel],
+    references: [defenseBonusLevels.level],
+  }),
 }));
 
 export const staticSkillsRelations = relations(staticSkills, ({ many }) => ({
   staticPowers: many(staticPowers),
 }));
 
-export const reductionLevelsRelations = relations(reductionLevels, ({ many }) => ({
+export const reductionLevelsRelations = relations(damageReductionLevels, ({ many }) => ({
   damageReductions: many(damageReductions),
   staticPowers: many(staticPowers),
 }));
 
-export const damageReductionsRelations = relations(damageReductions, ({ one }) => ({
-  reductionLevel: one(reductionLevels, {
-    fields: [damageReductions.reductionLevel],
-    references: [reductionLevels.level],
+export const staticBonusDamagesToProficiencyDamagesRelations = relations(
+  staticBonusDamagesToProficiencyDamages,
+  ({ one }) => ({
+    staticBonusDamage: one(staticBonusDamages, {
+      fields: [staticBonusDamagesToProficiencyDamages.staticBonusDamageId],
+      references: [staticBonusDamages.id],
+    }),
+    proficiencyDamage: one(proficiencyDamages, {
+      fields: [staticBonusDamagesToProficiencyDamages.proficiencyDamageId],
+      references: [proficiencyDamages.id],
+    }),
   }),
-  damageType: one(damageTypes, {
-    fields: [damageReductions.damageType],
-    references: [damageTypes.name],
+);
+
+export const staticBonusDamagesToTypeDamagesRelations = relations(
+  staticBonusDamagesToTypeDamages,
+  ({ one }) => ({
+    staticBonusDamage: one(staticBonusDamages, {
+      fields: [staticBonusDamagesToTypeDamages.staticBonusDamageId],
+      references: [staticBonusDamages.id],
+    }),
+    typeDamage: one(typeDamages, {
+      fields: [staticBonusDamagesToTypeDamages.typeDamageId],
+      references: [typeDamages.id],
+    }),
   }),
-}));
+);
+
+export const staticDamageReductionsToDamageReductionsRelations = relations(
+  staticDamageReductionsToDamageReductions,
+  ({ one }) => ({
+    staticDamageReduction: one(staticDamageReductions, {
+      fields: [staticDamageReductionsToDamageReductions.staticDamageReductionId],
+      references: [staticDamageReductions.id],
+    }),
+    damageReduction: one(damageReductions, {
+      fields: [staticDamageReductionsToDamageReductions.damageReductionId],
+      references: [damageReductions.id],
+    }),
+  }),
+);

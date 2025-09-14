@@ -6,22 +6,29 @@ export const communities = sqliteTable('communities', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   description: text('description').notNull(),
-  slug: text('slug').unique(),
-  creatorId: text('creator_id').notNull(),
+  slug: text('slug').notNull().unique(),
+  creatorId: text('creator_id')
+    .notNull()
+    .references(() => users.id),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 });
 
 export const members = sqliteTable(
   'members',
   {
-    id: text('id').primaryKey(),
-    userId: text('user_id').notNull(),
-    communityId: text('community_id').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id),
+    communityId: text('community_id')
+      .notNull()
+      .references(() => communities.id),
     nickname: text('nickname').notNull(),
-    roleId: text('role_id').notNull(),
+    roleId: text('role_id')
+      .notNull()
+      .references(() => roles.id),
     joinedAt: integer('joined_at', { mode: 'timestamp' }).notNull(),
   },
-  t => [unique().on(t.communityId, t.userId)],
+  t => [primaryKey({ columns: [t.userId, t.communityId] })],
 );
 
 export const roles = sqliteTable(
@@ -30,7 +37,9 @@ export const roles = sqliteTable(
     id: text('id').primaryKey(),
     name: text('name').notNull(),
     description: text('description'),
-    communityId: text('community_id').notNull(),
+    communityId: text('community_id')
+      .notNull()
+      .references(() => communities.id),
   },
   t => [unique().on(t.communityId, t.name)],
 );
@@ -39,7 +48,9 @@ export const tables = sqliteTable('tables', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   description: text('description').notNull(),
-  systemId: text('system_id').notNull(),
+  systemId: text('system_id')
+    .notNull()
+    .references(() => systems.id),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 });
 
@@ -63,7 +74,7 @@ export const tablesRelations = relations(tables, ({ many, one }) => ({
 
 export const genres = sqliteTable('genres', {
   id: text('id').primaryKey(),
-  name: text('text').notNull(),
+  name: text('name').notNull(),
 });
 
 export const genresRelations = relations(genres, ({ many }) => ({
@@ -76,11 +87,11 @@ export const tablesToGenres = sqliteTable(
     tableId: text('table_id')
       .notNull()
       .references(() => tables.id),
-    genresId: text('genres_id')
+    genreId: text('genre_id')
       .notNull()
       .references(() => genres.id),
   },
-  t => [primaryKey({ columns: [t.tableId, t.genresId] })],
+  t => [primaryKey({ columns: [t.tableId, t.genreId] })],
 );
 
 export const rolesRelations = relations(roles, ({ many, one }) => ({
@@ -92,34 +103,24 @@ export const rolesRelations = relations(roles, ({ many, one }) => ({
 }));
 
 export const communitiesRelations = relations(communities, ({ many, one }) => ({
-  membersToCommunities: many(membersToCommunities),
-  creator: one(members, {
+  creator: one(users, {
     fields: [communities.creatorId],
-    references: [members.id],
+    references: [users.id],
   }),
+  members: many(members),
 }));
 
-export const membersRelations = relations(members, ({ many, one }) => ({
-  membersToCommunities: many(membersToCommunities),
+export const membersRelations = relations(members, ({ one }) => ({
   user: one(users, {
     fields: [members.userId],
     references: [users.id],
+  }),
+  community: one(communities, {
+    fields: [members.communityId],
+    references: [communities.id],
   }),
   role: one(roles, {
     fields: [members.roleId],
     references: [roles.id],
   }),
 }));
-
-export const membersToCommunities = sqliteTable(
-  'members_to_communities',
-  {
-    memberId: text('member_id')
-      .notNull()
-      .references(() => members.id),
-    communityId: text('community_id')
-      .notNull()
-      .references(() => communities.id),
-  },
-  t => [primaryKey({ columns: [t.memberId, t.communityId] })],
-);
