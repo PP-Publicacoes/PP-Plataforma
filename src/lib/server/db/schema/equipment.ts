@@ -64,7 +64,7 @@ export const weaponsToWeaponsExtras = sqliteTable(
 // -------------------- relations --------------------
 
 export const weaponsRelations = relations(weapons, ({ many, one }) => ({
-  weaponsToWeaponsExtras: many(weaponsToWeaponsExtras),
+  weaponsExtrasLinks: many(weaponsToWeaponsExtras),
   damageType: one(damageTypes, {
     fields: [weapons.damageTypeName],
     references: [damageTypes.name],
@@ -80,7 +80,7 @@ export const weaponsRelations = relations(weapons, ({ many, one }) => ({
 }));
 
 export const weaponsExtrasRelations = relations(weaponsExtras, ({ many }) => ({
-  weaponsToWeaponsExtras: many(weaponsToWeaponsExtras),
+  weaponsLinks: many(weaponsToWeaponsExtras),
 }));
 
 export const damageTypesRelations = relations(damageTypes, ({ many }) => ({

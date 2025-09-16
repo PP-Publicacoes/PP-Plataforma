@@ -13,6 +13,8 @@ export const communities = sqliteTable('communities', {
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 });
 
+export type Community = typeof communities.$inferSelect;
+
 export const members = sqliteTable(
   'members',
   {
@@ -28,7 +30,7 @@ export const members = sqliteTable(
       .references(() => roles.id),
     joinedAt: integer('joined_at', { mode: 'timestamp' }).notNull(),
   },
-  t => [primaryKey({ columns: [t.userId, t.communityId] })],
+  t => [primaryKey({ columns: [t.userId, t.communityId], name: 'member_pk' })],
 );
 
 export const roles = sqliteTable(

@@ -10,20 +10,14 @@ export const attributes = sqliteTable('attributes', {
   description: text('description').notNull(),
 });
 
+export const statuses = sqliteTable('statuses', {
+  name: text('name').primaryKey(),
+  description: text('description').notNull(),
+});
+
 export const skillLevels = sqliteTable('skill_levels', {
   level: text('level').primaryKey(),
   bonus: integer('bonus').notNull(),
-});
-
-export const statusSheet = sqliteTable('status_sheet', {
-  id: text('id').primaryKey(),
-  characterId: text('character_id')
-    .notNull()
-    .references(() => characters.id),
-  hp: integer('hp').notNull(),
-  hope: integer('hope').notNull(),
-  level: integer('level').notNull(),
-  fear: integer('fear').notNull(),
 });
 
 export const ranks = sqliteTable('ranks', {
@@ -59,6 +53,18 @@ export const attributesSheet = sqliteTable('attributes_sheet', {
   study: integer('study').notNull(),
   spirit: integer('spirit').notNull(),
   charisma: integer('charisma').notNull(),
+});
+
+// same
+export const statusSheet = sqliteTable('status_sheet', {
+  id: text('id').primaryKey(),
+  characterId: text('character_id')
+    .notNull()
+    .references(() => characters.id),
+  hp: integer('hp').notNull(),
+  hope: integer('hope').notNull(),
+  level: integer('level').notNull(),
+  fear: integer('fear').notNull(),
 });
 
 export const skills = sqliteTable('skills', {
@@ -147,12 +153,12 @@ export const charactersRelations = relations(characters, ({ many, one }) => ({
     fields: [characters.rankId],
     references: [ranks.id],
   }),
-  charactersToSkillBonuses: many(charactersToSkillBonuses),
-  charactersToPowers: many(charactersToPowers),
+  skillBonusesLinks: many(charactersToSkillBonuses),
+  powersLinks: many(charactersToPowers),
 }));
 
 export const skillsRelations = relations(skills, ({ many, one }) => ({
-  charactersToSkills: many(charactersToSkillBonuses),
+  charactersLinks: many(charactersToSkillBonuses),
   skillBonuses: many(skillBonuses),
   attribute: one(attributes, {
     fields: [skills.attributeName],
@@ -169,7 +175,7 @@ export const skillBonusesRelations = relations(skillBonuses, ({ many, one }) => 
     fields: [skillBonuses.skillLevel],
     references: [skillLevels.level],
   }),
-  charactersToSkillBonuses: many(charactersToSkillBonuses),
+  charactersLinks: many(charactersToSkillBonuses),
 }));
 
 export const charactersToSkillBonusRelations = relations(charactersToSkillBonuses, ({ one }) => ({

@@ -51,6 +51,7 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 }));
 
 export type User = typeof users.$inferSelect;
+export type PublicUser = Omit<User, 'passwordHash'> | null;
 export type Session = typeof sessions.$inferSelect;
 export type UserInsert = typeof users.$inferInsert;
 export type SessionInsert = typeof sessions.$inferInsert;

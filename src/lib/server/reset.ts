@@ -51,7 +51,7 @@ export async function createPasswordResetToken(
 
 export async function consumePasswordResetToken(token: string) {
   const tokenHash = await sha256base64url(token);
-  const now = Date.now();
+  const now = new Date();
 
   const rows = await db
     .select()
@@ -60,7 +60,7 @@ export async function consumePasswordResetToken(token: string) {
 
   const rec = rows.at(0);
   if (!rec) return { ok: false as const, reason: 'INVALID' };
-  if (rec.expiresAt.getTime() < now) return { ok: false as const, reason: 'EXPIRED', record: rec };
+  if (rec.expiresAt.getTime() < now.getTime()) return { ok: false as const, reason: 'EXPIRED', record: rec };
 
   // marca como usado (single-use)
   await db

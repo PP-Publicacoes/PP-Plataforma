@@ -1,6 +1,4 @@
-import { StatusModificavel, StatusReferenciavel } from '$lib/enums/character/status';
 import { relations } from 'drizzle-orm';
-import { valuesToTuple } from '../../../utils/enum-utils';
 import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { attributes, skillLevels, skills } from './character';
 import { damageTypes, proficiencies, proficiencyLevels } from './equipment';
@@ -12,7 +10,6 @@ export const powers = sqliteTable('powers', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   description: text('description').notNull(),
-  // typeName: text('type').notNull().references(() => powerTypes.name),
   staticId: text('static_id').references(() => staticPowers.id),
   scalableId: text('scalable_id').references(() => scalablePowers.id),
   requirementId: text('requirement_id').references(() => powerRequirements.id),
@@ -97,10 +94,6 @@ export const powerPowerRequirements = sqliteTable(
   t => [primaryKey({ columns: [t.powerRequirementId, t.powerId] })],
 );
 
-// export const powerTypes = sqliteTable('power_types', {
-//   type: text('type').primaryKey(),
-// });
-
 export const defenseBonusLevels = sqliteTable('defense_bonus_levels', {
   level: text('level').primaryKey(),
   bonus: integer('bonus').notNull(),
@@ -108,10 +101,13 @@ export const defenseBonusLevels = sqliteTable('defense_bonus_levels', {
 
 export const scalablePowers = sqliteTable('scalable_powers', {
   id: text('id').primaryKey(),
-  interval: integer('interval').notNull(), // was "cada"
-  referencable: text('referencable', { enum: valuesToTuple(StatusReferenciavel) }).notNull(),
-  value: integer('value').notNull(), // was "valor"
-  modifiable: text('modifiable', { enum: valuesToTuple(StatusModificavel) }).notNull(), // was "modificavel"
+  each: integer('each').notNull(),
+  modifiesHp: integer('modifies_hp', { mode: 'boolean' }).default(false),
+  modifiesHope: integer('modifies_hope', { mode: 'boolean' }).default(false),
+  basedOnFear: integer('based_on_fear', { mode: 'boolean' }).default(false),
+  basedOnLevel: integer('based_on_level', { mode: 'boolean' }).default(false),
+  basedOnRank: integer('based_on_rank', { mode: 'boolean' }).default(false),
+  modification: integer('modification').notNull(),
 });
 
 export const staticPowers = sqliteTable('static_powers', {
@@ -214,8 +210,8 @@ export const staticDamageReductionsToDamageReductions = sqliteTable(
 // -------------------- relations --------------------
 
 export const staticBonusDamagesRelations = relations(staticBonusDamages, ({ many }) => ({
-  staticBonusDamagesToProficiencyDamages: many(staticBonusDamagesToProficiencyDamages),
-  staticBonusDamagesToTypeDamages: many(staticBonusDamagesToTypeDamages),
+  proficiencyDamagesLinks: many(staticBonusDamagesToProficiencyDamages),
+  typeDamagesLinks: many(staticBonusDamagesToTypeDamages),
 }));
 
 export const proficiencyDamagesRelations = relations(proficiencyDamages, ({ many, one }) => ({
@@ -223,7 +219,7 @@ export const proficiencyDamagesRelations = relations(proficiencyDamages, ({ many
     fields: [proficiencyDamages.proficiencyName],
     references: [proficiencies.name],
   }),
-  staticBonusDamagesToProficiencyDamages: many(staticBonusDamagesToProficiencyDamages),
+  staticBonusDamagesLinks: many(staticBonusDamagesToProficiencyDamages),
 }));
 
 export const typeDamagesRelations = relations(typeDamages, ({ many, one }) => ({
@@ -231,11 +227,11 @@ export const typeDamagesRelations = relations(typeDamages, ({ many, one }) => ({
     fields: [typeDamages.damageTypeName],
     references: [damageTypes.name],
   }),
-  staticBonusDamagesToTypeDamages: many(staticBonusDamagesToTypeDamages),
+  staticBonusDamagesLinks: many(staticBonusDamagesToTypeDamages),
 }));
 
 export const staticDamageReductionsRelations = relations(staticDamageReductions, ({ many }) => ({
-  staticDamageReductionsToDamageReductions: many(staticDamageReductionsToDamageReductions),
+  staticDamageReductionsLinks: many(staticDamageReductionsToDamageReductions),
 }));
 
 export const damageReductionsRelations = relations(damageReductions, ({ one, many }) => ({
@@ -247,7 +243,7 @@ export const damageReductionsRelations = relations(damageReductions, ({ one, man
     fields: [damageReductions.damageTypeName],
     references: [damageTypes.name],
   }),
-  staticDamageReductionsToDamageReductions: many(staticDamageReductionsToDamageReductions),
+  staticDamageReductionsLinks: many(staticDamageReductionsToDamageReductions),
 }));
 
 export const powersRelations = relations(powers, ({ one }) => ({
@@ -343,11 +339,7 @@ export const powerPowerRequirementsRelations = relations(powerPowerRequirements,
   }),
 }));
 
-// export const powerTypesRelations = relations(powerTypes, ({ many }) => ({
-//   powers: many(powers),
-// }));
-
-export const scalablePowersRelations = relations(scalablePowers, ({ many }) => ({
+export const scalablePowersRelations = relations(scalablePowers, ({ many, one }) => ({
   powers: many(powers),
 }));
 

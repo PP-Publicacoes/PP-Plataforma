@@ -1,8 +1,5 @@
 // +page.server.ts
-import * as auth from '$lib/server/auth';
 import { fail } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
-import { db } from '$lib/server/db';
 import type { Actions, PageServerLoad } from './$types';
 import type { RequestEvent } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
@@ -16,9 +13,10 @@ import {
 import { m } from '$lib/paraglide/messages';
 import { generateDeterministicSlug } from '$lib/utils/random';
 import { AuthTab } from '$lib/enums/auth-tab';
-import { hashPassword, verifyPassword } from '$lib/server/password';
+import { hashPassword } from '$lib/server/password';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
-import { users } from '$lib/server/db/schema/auth';
+import { type UserInsert } from '$lib/server/db/schema/auth';
+import { authService } from '$lib/server/services/auth';
 
 export const load: PageServerLoad = async (event: RequestEvent) => {
   // Retorna o usuário quando houver sessão ativa, caso contrário retorna {}.
@@ -46,8 +44,9 @@ export const actions: Actions = {
     const { username, password } = form.data as LoginInput;
 
     // busca usuário
-    const results = await db.select().from(users).where(eq(users.username, username));
-    const existingUser = results.at(0);
+    const existingUser = (await authService.getUserByUsername(username)).at(0);
+    // const results = await db.select().from(users).where(eq(users.username, username));
+    // const existingUser = results.at(0);
 
     if (!existingUser) {
       // marca erro genérico (não vaze info) e retorna o form
@@ -59,20 +58,18 @@ export const actions: Actions = {
     }
 
     // verifica senha
-    const validPassword = await verifyPassword(existingUser.passwordHash, password);
+    const validPassword = await authService.validatePassword(username, password);
 
     if (!validPassword) {
       form.valid = false;
-      form.errors?.password?.push(m['errors.form.auth.invalid_credentials']());
+      form.errors?._errors?.push(m['errors.form.auth.invalid_credentials']());
 
       setFlash({ type: 'error', message: m['toast.login.error']() }, event.cookies);
       return fail(400, { form });
     }
 
     // criado sessao e cookie
-    const sessionToken = auth.generateSessionToken();
-    const session = await auth.createSession(sessionToken, existingUser.id);
-    auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
+    authService.setUpSessionAndCookies(event, existingUser.id)
 
     // sucesso -> redireciona
     redirect('/', { type: 'success', message: m['toast.login.success']() }, event.cookies);
@@ -90,7 +87,7 @@ export const actions: Actions = {
     const { username, password, email } = form.data as RegisterInput;
 
     // verifica se username ou email já existem
-    const byUsername = await db.select().from(users).where(eq(users.username, username));
+    const byUsername = await authService.getUserByUsername(username);
     if (byUsername.length > 0) {
       form.valid = false;
       form.errors?.username?.push(m['errors.form.username.exists']());
@@ -99,7 +96,7 @@ export const actions: Actions = {
       return fail(400, { form });
     }
 
-    const byEmail = await db.select().from(users).where(eq(users.email, email));
+    const byEmail = await authService.getUserByEmail(email);
     if (byEmail.length > 0) {
       form.valid = false;
       form.errors?.email?.push(m['errors.form.email.exists']());
@@ -112,22 +109,21 @@ export const actions: Actions = {
     const passwordHash = await hashPassword(password);
 
     // gera id do usuário (usa sua função generateUserId)
-    const userId = auth.generateUserId();
+    const userId = authService.generateUserId();
 
     try {
-      await db.insert(users).values({
+      const user = {
         id: userId,
         username,
         email,
         passwordHash,
         slug: generateDeterministicSlug(userId),
-      });
+        createdAt: new Date(),
+      } satisfies UserInsert;
+      await authService.newUser(user);
 
       // cria sessão e seta cookie
-      const sessionToken = auth.generateSessionToken();
-      const session = await auth.createSession(sessionToken, userId);
-
-      auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
+      authService.setUpSessionAndCookies(event, userId);
     } catch (err) {
       console.error('Register error:', err);
 
@@ -148,8 +144,8 @@ export const actions: Actions = {
       return fail(401);
     }
 
-    await auth.invalidateSession(event.locals.session.id);
-    auth.deleteSessionTokenCookie(event);
+    await authService.invalidateSession(event.locals.session.id);
+    authService.deleteSessionTokenCookie(event);
 
     redirect('/', { type: 'success', message: m['toast.logout.success']() }, event.cookies);
   },
