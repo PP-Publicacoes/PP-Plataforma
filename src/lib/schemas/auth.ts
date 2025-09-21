@@ -1,18 +1,16 @@
 import { m } from '$lib/paraglide/messages';
-import { users } from '$lib/server/db/schema/auth';
-import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod/v4';
 
 const usernameSchema = z
   .string()
   .nonempty({ message: m['errors.form.username.required']() })
-  .min(2, { message: m['errors.form.username.min']() })
-  .max(25, { message: m['errors.form.username.max']() });
+  .min(2, { message: m['errors.form.username.min']({ min: 2 }) })
+  .max(25, { message: m['errors.form.username.max']({ max: 25 }) });
 
 const passwordSchema = z
   .string()
-  .min(8, { message: m['errors.form.password.min']() })
-  .max(20, { message: m['errors.form.password.max']() });
+  .min(8, { message: m['errors.form.password.min']({ min: 8 }) })
+  .max(20, { message: m['errors.form.password.max']({ max: 20 }) });
 
 const passwordWithPolicySchema = passwordSchema
   .refine(p => /[A-Z]/.test(p), { message: m['errors.form.password.uppercase']() })
@@ -65,5 +63,3 @@ export const resetPasswordSchema = z
   });
 
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
-
-export const userInsertSchema = createInsertSchema(users);

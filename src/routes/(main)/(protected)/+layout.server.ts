@@ -1,8 +1,8 @@
 // src/routes/(protected)/+layout.server.ts
 import type { LayoutServerLoad } from './$types';
-import { requireLogin } from '$lib/server/auth';
+import { authService } from '$lib/server/services/auth';
 
 export const load: LayoutServerLoad = async event => {
-  const user = requireLogin(event);
+  const user = authService.requireLogin(event);
   return { user };
 };

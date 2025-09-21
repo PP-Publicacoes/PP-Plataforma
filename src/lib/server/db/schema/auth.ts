@@ -2,6 +2,7 @@ import { relations } from 'drizzle-orm';
 import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
 import { members } from './table';
 import { characters } from './character';
+import { createInsertSchema } from 'drizzle-zod';
 
 export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
@@ -51,7 +52,8 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 }));
 
 export type User = typeof users.$inferSelect;
-export type PublicUser = Omit<User, 'passwordHash'> | null;
 export type Session = typeof sessions.$inferSelect;
 export type UserInsert = typeof users.$inferInsert;
 export type SessionInsert = typeof sessions.$inferInsert;
+
+export const userInsertSchema = createInsertSchema(users);

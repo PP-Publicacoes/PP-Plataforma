@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e6de3780-2f95-4d79-9c23-b16416e8762f",
+  "id": "27bf9c76-be60-423c-9740-0b93feecb978",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "password_reset_tokens": {
@@ -33,8 +33,7 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
-          "default": "(unixepoch())"
+          "autoincrement": false
         },
         "expires_at": {
           "name": "expires_at",
@@ -66,7 +65,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "password_reset_tokens_user_id_users_id_fk": {
+          "name": "password_reset_tokens_user_id_users_id_fk",
+          "tableFrom": "password_reset_tokens",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -97,7 +110,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "sessions_user_id_users_id_fk": {
+          "name": "sessions_user_id_users_id_fk",
+          "tableFrom": "sessions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -159,8 +186,7 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
-          "default": "(unixepoch())"
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -191,59 +217,22 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "pericias": {
-      "name": "pericias",
+    "attributes": {
+      "name": "attributes",
       "columns": {
-        "id": {
-          "name": "id",
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false
         },
-        "nome": {
-          "name": "nome",
+        "description": {
+          "name": "description",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "descricao": {
-          "name": "descricao",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "atributo": {
-          "name": "atributo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "bonus": {
-          "name": "bonus",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "penalidade_carga": {
-          "name": "penalidade_carga",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": false
-        },
-        "somente_treinado": {
-          "name": "somente_treinado",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": false
         }
       },
       "indexes": {},
@@ -252,8 +241,88 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "personagens": {
-      "name": "personagens",
+    "attributes_sheet": {
+      "name": "attributes_sheet",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "character_id": {
+          "name": "character_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "strength": {
+          "name": "strength",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "dexterity": {
+          "name": "dexterity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "attention": {
+          "name": "attention",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "study": {
+          "name": "study",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "spirit": {
+          "name": "spirit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "charisma": {
+          "name": "charisma",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "attributes_sheet_character_id_characters_id_fk": {
+          "name": "attributes_sheet_character_id_characters_id_fk",
+          "tableFrom": "attributes_sheet",
+          "tableTo": "characters",
+          "columnsFrom": [
+            "character_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "characters": {
+      "name": "characters",
       "columns": {
         "id": {
           "name": "id",
@@ -266,95 +335,25 @@
           "name": "user_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "vida": {
-          "name": "vida",
-          "type": "integer",
-          "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "esperanca": {
-          "name": "esperanca",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "nivel": {
-          "name": "nivel",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "medo": {
-          "name": "medo",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "patente": {
-          "name": "patente",
+        "rank_id": {
+          "name": "rank_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "carga": {
-          "name": "carga",
+        "load_capacity": {
+          "name": "load_capacity",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "defesa": {
-          "name": "defesa",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "fisico": {
-          "name": "fisico",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "destreza": {
-          "name": "destreza",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "carisma": {
-          "name": "carisma",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "erudicao": {
-          "name": "erudicao",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "raciocinio": {
-          "name": "raciocinio",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "sabedoria": {
-          "name": "sabedoria",
+        "defense": {
+          "name": "defense",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -362,23 +361,50 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "characters_user_id_users_id_fk": {
+          "name": "characters_user_id_users_id_fk",
+          "tableFrom": "characters",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "characters_rank_id_ranks_id_fk": {
+          "name": "characters_rank_id_ranks_id_fk",
+          "tableFrom": "characters",
+          "tableTo": "ranks",
+          "columnsFrom": [
+            "rank_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "personagens_to_pericias": {
-      "name": "personagens_to_pericias",
+    "characters_to_powers": {
+      "name": "characters_to_powers",
       "columns": {
-        "personagem_id": {
-          "name": "personagem_id",
+        "character_id": {
+          "name": "character_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "pericia_id": {
-          "name": "pericia_id",
+        "power_id": {
+          "name": "power_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -387,12 +413,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "personagens_to_pericias_personagem_id_personagens_id_fk": {
-          "name": "personagens_to_pericias_personagem_id_personagens_id_fk",
-          "tableFrom": "personagens_to_pericias",
-          "tableTo": "personagens",
+        "characters_to_powers_character_id_characters_id_fk": {
+          "name": "characters_to_powers_character_id_characters_id_fk",
+          "tableFrom": "characters_to_powers",
+          "tableTo": "characters",
           "columnsFrom": [
-            "personagem_id"
+            "character_id"
           ],
           "columnsTo": [
             "id"
@@ -400,12 +426,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "personagens_to_pericias_pericia_id_pericias_id_fk": {
-          "name": "personagens_to_pericias_pericia_id_pericias_id_fk",
-          "tableFrom": "personagens_to_pericias",
-          "tableTo": "pericias",
+        "characters_to_powers_power_id_powers_id_fk": {
+          "name": "characters_to_powers_power_id_powers_id_fk",
+          "tableFrom": "characters_to_powers",
+          "tableTo": "powers",
           "columnsFrom": [
-            "pericia_id"
+            "power_id"
           ],
           "columnsTo": [
             "id"
@@ -415,29 +441,29 @@
         }
       },
       "compositePrimaryKeys": {
-        "personagens_to_pericias_personagem_id_pericia_id_pk": {
+        "characters_to_powers_character_id_power_id_pk": {
           "columns": [
-            "personagem_id",
-            "pericia_id"
+            "character_id",
+            "power_id"
           ],
-          "name": "personagens_to_pericias_personagem_id_pericia_id_pk"
+          "name": "characters_to_powers_character_id_power_id_pk"
         }
       },
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "personagens_to_poderes": {
-      "name": "personagens_to_poderes",
+    "characters_to_skill_bonus": {
+      "name": "characters_to_skill_bonus",
       "columns": {
-        "personagem_id": {
-          "name": "personagem_id",
+        "character_id": {
+          "name": "character_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "poder_id": {
-          "name": "poder_id",
+        "skill_bonus_id": {
+          "name": "skill_bonus_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -446,12 +472,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "personagens_to_poderes_personagem_id_personagens_id_fk": {
-          "name": "personagens_to_poderes_personagem_id_personagens_id_fk",
-          "tableFrom": "personagens_to_poderes",
-          "tableTo": "personagens",
+        "characters_to_skill_bonus_character_id_characters_id_fk": {
+          "name": "characters_to_skill_bonus_character_id_characters_id_fk",
+          "tableFrom": "characters_to_skill_bonus",
+          "tableTo": "characters",
           "columnsFrom": [
-            "personagem_id"
+            "character_id"
           ],
           "columnsTo": [
             "id"
@@ -459,12 +485,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "personagens_to_poderes_poder_id_poderes_id_fk": {
-          "name": "personagens_to_poderes_poder_id_poderes_id_fk",
-          "tableFrom": "personagens_to_poderes",
-          "tableTo": "poderes",
+        "characters_to_skill_bonus_skill_bonus_id_skill_bonuses_id_fk": {
+          "name": "characters_to_skill_bonus_skill_bonus_id_skill_bonuses_id_fk",
+          "tableFrom": "characters_to_skill_bonus",
+          "tableTo": "skill_bonuses",
           "columnsFrom": [
-            "poder_id"
+            "skill_bonus_id"
           ],
           "columnsTo": [
             "id"
@@ -474,81 +500,19 @@
         }
       },
       "compositePrimaryKeys": {
-        "personagens_to_poderes_personagem_id_poder_id_pk": {
+        "characters_to_skill_bonus_character_id_skill_bonus_id_pk": {
           "columns": [
-            "personagem_id",
-            "poder_id"
+            "character_id",
+            "skill_bonus_id"
           ],
-          "name": "personagens_to_poderes_personagem_id_poder_id_pk"
+          "name": "characters_to_skill_bonus_character_id_skill_bonus_id_pk"
         }
       },
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "weapons": {
-      "name": "weapons",
-      "columns": {
-        "nome": {
-          "name": "nome",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "dado": {
-          "name": "dado",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "numero_dados": {
-          "name": "numero_dados",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 1
-        },
-        "margem_critico": {
-          "name": "margem_critico",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "ameaca": {
-          "name": "ameaca",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 1
-        },
-        "tipo_dano": {
-          "name": "tipo_dano",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "extras": {
-          "name": "extras",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "poderes": {
-      "name": "poderes",
+    "ranks": {
+      "name": "ranks",
       "columns": {
         "id": {
           "name": "id",
@@ -557,46 +521,1742 @@
           "notNull": true,
           "autoincrement": false
         },
-        "nome": {
-          "name": "nome",
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "descricao": {
-          "name": "descricao",
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "proficiency_credits": {
+          "name": "proficiency_credits",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "skill_bonuses": {
+      "name": "skill_bonuses",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "skill_name": {
+          "name": "skill_name",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "tipo": {
-          "name": "tipo",
+        "skill_level": {
+          "name": "skill_level",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "other": {
+          "name": "other",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "skill_bonuses_skill_name_skills_name_fk": {
+          "name": "skill_bonuses_skill_name_skills_name_fk",
+          "tableFrom": "skill_bonuses",
+          "tableTo": "skills",
+          "columnsFrom": [
+            "skill_name"
+          ],
+          "columnsTo": [
+            "name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "skill_bonuses_skill_level_skill_levels_level_fk": {
+          "name": "skill_bonuses_skill_level_skill_levels_level_fk",
+          "tableFrom": "skill_bonuses",
+          "tableTo": "skill_levels",
+          "columnsFrom": [
+            "skill_level"
+          ],
+          "columnsTo": [
+            "level"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "skill_levels": {
+      "name": "skill_levels",
+      "columns": {
+        "level": {
+          "name": "level",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "bonus": {
+          "name": "bonus",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "skills": {
+      "name": "skills",
+      "columns": {
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "escalavel": {
-          "name": "escalavel",
+        "attribute_name": {
+          "name": "attribute_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "load_penalty": {
+          "name": "load_penalty",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "trained_only": {
+          "name": "trained_only",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "skills_attribute_name_attributes_name_fk": {
+          "name": "skills_attribute_name_attributes_name_fk",
+          "tableFrom": "skills",
+          "tableTo": "attributes",
+          "columnsFrom": [
+            "attribute_name"
+          ],
+          "columnsTo": [
+            "name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "status_sheet": {
+      "name": "status_sheet",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "character_id": {
+          "name": "character_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "hp": {
+          "name": "hp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "hope": {
+          "name": "hope",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "level": {
+          "name": "level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fear": {
+          "name": "fear",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "status_sheet_character_id_characters_id_fk": {
+          "name": "status_sheet_character_id_characters_id_fk",
+          "tableFrom": "status_sheet",
+          "tableTo": "characters",
+          "columnsFrom": [
+            "character_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "statuses": {
+      "name": "statuses",
+      "columns": {
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "damage_types": {
+      "name": "damage_types",
+      "columns": {
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "proficiencies": {
+      "name": "proficiencies",
+      "columns": {
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "proficiency_levels": {
+      "name": "proficiency_levels",
+      "columns": {
+        "level": {
+          "name": "level",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cost": {
+          "name": "cost",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "credits": {
+          "name": "credits",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "weapons": {
+      "name": "weapons",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "die_name": {
+          "name": "die_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "dice_count": {
+          "name": "dice_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "critical_margin": {
+          "name": "critical_margin",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "threat": {
+          "name": "threat",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 2
+        },
+        "damage_type_name": {
+          "name": "damage_type_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "proficiency_name": {
+          "name": "proficiency_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "weapons_die_name_dices_name_fk": {
+          "name": "weapons_die_name_dices_name_fk",
+          "tableFrom": "weapons",
+          "tableTo": "dices",
+          "columnsFrom": [
+            "die_name"
+          ],
+          "columnsTo": [
+            "name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "weapons_damage_type_name_damage_types_name_fk": {
+          "name": "weapons_damage_type_name_damage_types_name_fk",
+          "tableFrom": "weapons",
+          "tableTo": "damage_types",
+          "columnsFrom": [
+            "damage_type_name"
+          ],
+          "columnsTo": [
+            "name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "weapons_proficiency_name_proficiencies_name_fk": {
+          "name": "weapons_proficiency_name_proficiencies_name_fk",
+          "tableFrom": "weapons",
+          "tableTo": "proficiencies",
+          "columnsFrom": [
+            "proficiency_name"
+          ],
+          "columnsTo": [
+            "name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "weapons_extras": {
+      "name": "weapons_extras",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "attack_bonus": {
+          "name": "attack_bonus",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "damage_bonus": {
+          "name": "damage_bonus",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "critical_margin": {
+          "name": "critical_margin",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "threat": {
+          "name": "threat",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "weapons_to_weapons_extras": {
+      "name": "weapons_to_weapons_extras",
+      "columns": {
+        "weapons_id": {
+          "name": "weapons_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "weapons_extras_id": {
+          "name": "weapons_extras_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "weapons_to_weapons_extras_weapons_id_weapons_id_fk": {
+          "name": "weapons_to_weapons_extras_weapons_id_weapons_id_fk",
+          "tableFrom": "weapons_to_weapons_extras",
+          "tableTo": "weapons",
+          "columnsFrom": [
+            "weapons_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "weapons_to_weapons_extras_weapons_extras_id_weapons_extras_id_fk": {
+          "name": "weapons_to_weapons_extras_weapons_extras_id_weapons_extras_id_fk",
+          "tableFrom": "weapons_to_weapons_extras",
+          "tableTo": "weapons_extras",
+          "columnsFrom": [
+            "weapons_extras_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "weapons_to_weapons_extras_weapons_id_weapons_extras_id_pk": {
+          "columns": [
+            "weapons_id",
+            "weapons_extras_id"
+          ],
+          "name": "weapons_to_weapons_extras_weapons_id_weapons_extras_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "affinity_levels": {
+      "name": "affinity_levels",
+      "columns": {
+        "level": {
+          "name": "level",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "hauntings": {
+      "name": "hauntings",
+      "columns": {
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "damage_reduction_levels": {
+      "name": "damage_reduction_levels",
+      "columns": {
+        "level": {
+          "name": "level",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "damage_reductions": {
+      "name": "damage_reductions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "damage_type_name": {
+          "name": "damage_type_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "damage_reduction_level": {
+          "name": "damage_reduction_level",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "damage_reductions_damage_type_name_damage_types_name_fk": {
+          "name": "damage_reductions_damage_type_name_damage_types_name_fk",
+          "tableFrom": "damage_reductions",
+          "tableTo": "damage_types",
+          "columnsFrom": [
+            "damage_type_name"
+          ],
+          "columnsTo": [
+            "name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "damage_reductions_damage_reduction_level_damage_reduction_levels_level_fk": {
+          "name": "damage_reductions_damage_reduction_level_damage_reduction_levels_level_fk",
+          "tableFrom": "damage_reductions",
+          "tableTo": "damage_reduction_levels",
+          "columnsFrom": [
+            "damage_reduction_level"
+          ],
+          "columnsTo": [
+            "level"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "defense_bonus_levels": {
+      "name": "defense_bonus_levels",
+      "columns": {
+        "level": {
+          "name": "level",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "bonus": {
+          "name": "bonus",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "power_affinity_requirements": {
+      "name": "power_affinity_requirements",
+      "columns": {
+        "power_requirement_id": {
+          "name": "power_requirement_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "haunting_name": {
+          "name": "haunting_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "affinity_level": {
+          "name": "affinity_level",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "power_affinity_requirements_power_requirement_id_power_requirements_id_fk": {
+          "name": "power_affinity_requirements_power_requirement_id_power_requirements_id_fk",
+          "tableFrom": "power_affinity_requirements",
+          "tableTo": "power_requirements",
+          "columnsFrom": [
+            "power_requirement_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "power_affinity_requirements_haunting_name_hauntings_name_fk": {
+          "name": "power_affinity_requirements_haunting_name_hauntings_name_fk",
+          "tableFrom": "power_affinity_requirements",
+          "tableTo": "hauntings",
+          "columnsFrom": [
+            "haunting_name"
+          ],
+          "columnsTo": [
+            "name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "power_affinity_requirements_affinity_level_affinity_levels_level_fk": {
+          "name": "power_affinity_requirements_affinity_level_affinity_levels_level_fk",
+          "tableFrom": "power_affinity_requirements",
+          "tableTo": "affinity_levels",
+          "columnsFrom": [
+            "affinity_level"
+          ],
+          "columnsTo": [
+            "level"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "power_affinity_requirements_power_requirement_id_haunting_name_pk": {
+          "columns": [
+            "power_requirement_id",
+            "haunting_name"
+          ],
+          "name": "power_affinity_requirements_power_requirement_id_haunting_name_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "power_attribute_requirements": {
+      "name": "power_attribute_requirements",
+      "columns": {
+        "power_requirement_id": {
+          "name": "power_requirement_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "attribute_name": {
+          "name": "attribute_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "power_attribute_requirements_power_requirement_id_power_requirements_id_fk": {
+          "name": "power_attribute_requirements_power_requirement_id_power_requirements_id_fk",
+          "tableFrom": "power_attribute_requirements",
+          "tableTo": "power_requirements",
+          "columnsFrom": [
+            "power_requirement_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "power_attribute_requirements_attribute_name_attributes_name_fk": {
+          "name": "power_attribute_requirements_attribute_name_attributes_name_fk",
+          "tableFrom": "power_attribute_requirements",
+          "tableTo": "attributes",
+          "columnsFrom": [
+            "attribute_name"
+          ],
+          "columnsTo": [
+            "name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "power_attribute_requirements_power_requirement_id_attribute_name_pk": {
+          "columns": [
+            "power_requirement_id",
+            "attribute_name"
+          ],
+          "name": "power_attribute_requirements_power_requirement_id_attribute_name_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "power_power_requirements": {
+      "name": "power_power_requirements",
+      "columns": {
+        "power_requirement_id": {
+          "name": "power_requirement_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "power_id": {
+          "name": "power_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "power_power_requirements_power_requirement_id_power_requirements_id_fk": {
+          "name": "power_power_requirements_power_requirement_id_power_requirements_id_fk",
+          "tableFrom": "power_power_requirements",
+          "tableTo": "power_requirements",
+          "columnsFrom": [
+            "power_requirement_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "power_power_requirements_power_id_powers_id_fk": {
+          "name": "power_power_requirements_power_id_powers_id_fk",
+          "tableFrom": "power_power_requirements",
+          "tableTo": "powers",
+          "columnsFrom": [
+            "power_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "power_power_requirements_power_requirement_id_power_id_pk": {
+          "columns": [
+            "power_requirement_id",
+            "power_id"
+          ],
+          "name": "power_power_requirements_power_requirement_id_power_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "power_proficiency_requirements": {
+      "name": "power_proficiency_requirements",
+      "columns": {
+        "power_requirement_id": {
+          "name": "power_requirement_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "proficiency_name": {
+          "name": "proficiency_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "proficiency_level": {
+          "name": "proficiency_level",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "power_proficiency_requirements_power_requirement_id_power_requirements_id_fk": {
+          "name": "power_proficiency_requirements_power_requirement_id_power_requirements_id_fk",
+          "tableFrom": "power_proficiency_requirements",
+          "tableTo": "power_requirements",
+          "columnsFrom": [
+            "power_requirement_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "power_proficiency_requirements_proficiency_name_proficiencies_name_fk": {
+          "name": "power_proficiency_requirements_proficiency_name_proficiencies_name_fk",
+          "tableFrom": "power_proficiency_requirements",
+          "tableTo": "proficiencies",
+          "columnsFrom": [
+            "proficiency_name"
+          ],
+          "columnsTo": [
+            "name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "power_proficiency_requirements_proficiency_level_proficiency_levels_level_fk": {
+          "name": "power_proficiency_requirements_proficiency_level_proficiency_levels_level_fk",
+          "tableFrom": "power_proficiency_requirements",
+          "tableTo": "proficiency_levels",
+          "columnsFrom": [
+            "proficiency_level"
+          ],
+          "columnsTo": [
+            "level"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "power_proficiency_requirements_power_requirement_id_proficiency_name_pk": {
+          "columns": [
+            "power_requirement_id",
+            "proficiency_name"
+          ],
+          "name": "power_proficiency_requirements_power_requirement_id_proficiency_name_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "power_requirements": {
+      "name": "power_requirements",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "power_skill_requirements": {
+      "name": "power_skill_requirements",
+      "columns": {
+        "power_requirement_id": {
+          "name": "power_requirement_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "skill_name": {
+          "name": "skill_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "skill_level": {
+          "name": "skill_level",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "power_skill_requirements_power_requirement_id_power_requirements_id_fk": {
+          "name": "power_skill_requirements_power_requirement_id_power_requirements_id_fk",
+          "tableFrom": "power_skill_requirements",
+          "tableTo": "power_requirements",
+          "columnsFrom": [
+            "power_requirement_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "power_skill_requirements_skill_name_skills_name_fk": {
+          "name": "power_skill_requirements_skill_name_skills_name_fk",
+          "tableFrom": "power_skill_requirements",
+          "tableTo": "skills",
+          "columnsFrom": [
+            "skill_name"
+          ],
+          "columnsTo": [
+            "name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "power_skill_requirements_skill_level_skill_levels_level_fk": {
+          "name": "power_skill_requirements_skill_level_skill_levels_level_fk",
+          "tableFrom": "power_skill_requirements",
+          "tableTo": "skill_levels",
+          "columnsFrom": [
+            "skill_level"
+          ],
+          "columnsTo": [
+            "level"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "power_skill_requirements_power_requirement_id_skill_name_pk": {
+          "columns": [
+            "power_requirement_id",
+            "skill_name"
+          ],
+          "name": "power_skill_requirements_power_requirement_id_skill_name_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "powers": {
+      "name": "powers",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "static_id": {
+          "name": "static_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "estatico": {
-          "name": "estatico",
+        "scalable_id": {
+          "name": "scalable_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "requerimentos": {
-          "name": "requerimentos",
+        "requirement_id": {
+          "name": "requirement_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "powers_static_id_static_powers_id_fk": {
+          "name": "powers_static_id_static_powers_id_fk",
+          "tableFrom": "powers",
+          "tableTo": "static_powers",
+          "columnsFrom": [
+            "static_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "powers_scalable_id_scalable_powers_id_fk": {
+          "name": "powers_scalable_id_scalable_powers_id_fk",
+          "tableFrom": "powers",
+          "tableTo": "scalable_powers",
+          "columnsFrom": [
+            "scalable_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "powers_requirement_id_power_requirements_id_fk": {
+          "name": "powers_requirement_id_power_requirements_id_fk",
+          "tableFrom": "powers",
+          "tableTo": "power_requirements",
+          "columnsFrom": [
+            "requirement_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "proficiency_damages": {
+      "name": "proficiency_damages",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "proficiency_name": {
+          "name": "proficiency_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "proficiency_damages_proficiency_name_proficiencies_name_fk": {
+          "name": "proficiency_damages_proficiency_name_proficiencies_name_fk",
+          "tableFrom": "proficiency_damages",
+          "tableTo": "proficiencies",
+          "columnsFrom": [
+            "proficiency_name"
+          ],
+          "columnsTo": [
+            "name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "scalable_powers": {
+      "name": "scalable_powers",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "each": {
+          "name": "each",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "modifies_hp": {
+          "name": "modifies_hp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "modifies_hope": {
+          "name": "modifies_hope",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "based_on_fear": {
+          "name": "based_on_fear",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "based_on_level": {
+          "name": "based_on_level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "based_on_rank": {
+          "name": "based_on_rank",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "modification": {
+          "name": "modification",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "static_bonus_damages": {
+      "name": "static_bonus_damages",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "static_bonus_damages_to_proficiency_damages": {
+      "name": "static_bonus_damages_to_proficiency_damages",
+      "columns": {
+        "static_bonus_damage_id": {
+          "name": "static_bonus_damage_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "proficiency_damage_id": {
+          "name": "proficiency_damage_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "static_bonus_damages_to_proficiency_damages_static_bonus_damage_id_static_bonus_damages_id_fk": {
+          "name": "static_bonus_damages_to_proficiency_damages_static_bonus_damage_id_static_bonus_damages_id_fk",
+          "tableFrom": "static_bonus_damages_to_proficiency_damages",
+          "tableTo": "static_bonus_damages",
+          "columnsFrom": [
+            "static_bonus_damage_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "static_bonus_damages_to_proficiency_damages_proficiency_damage_id_proficiency_damages_id_fk": {
+          "name": "static_bonus_damages_to_proficiency_damages_proficiency_damage_id_proficiency_damages_id_fk",
+          "tableFrom": "static_bonus_damages_to_proficiency_damages",
+          "tableTo": "proficiency_damages",
+          "columnsFrom": [
+            "proficiency_damage_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "static_bonus_damages_to_proficiency_damages_static_bonus_damage_id_proficiency_damage_id_pk": {
+          "columns": [
+            "static_bonus_damage_id",
+            "proficiency_damage_id"
+          ],
+          "name": "static_bonus_damages_to_proficiency_damages_static_bonus_damage_id_proficiency_damage_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "static_bonus_damages_to_type_damages": {
+      "name": "static_bonus_damages_to_type_damages",
+      "columns": {
+        "static_bonus_damage_id": {
+          "name": "static_bonus_damage_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "type_damage_id": {
+          "name": "type_damage_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "static_bonus_damages_to_type_damages_static_bonus_damage_id_static_bonus_damages_id_fk": {
+          "name": "static_bonus_damages_to_type_damages_static_bonus_damage_id_static_bonus_damages_id_fk",
+          "tableFrom": "static_bonus_damages_to_type_damages",
+          "tableTo": "static_bonus_damages",
+          "columnsFrom": [
+            "static_bonus_damage_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "static_bonus_damages_to_type_damages_type_damage_id_type_damages_id_fk": {
+          "name": "static_bonus_damages_to_type_damages_type_damage_id_type_damages_id_fk",
+          "tableFrom": "static_bonus_damages_to_type_damages",
+          "tableTo": "type_damages",
+          "columnsFrom": [
+            "type_damage_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "static_bonus_damages_to_type_damages_static_bonus_damage_id_type_damage_id_pk": {
+          "columns": [
+            "static_bonus_damage_id",
+            "type_damage_id"
+          ],
+          "name": "static_bonus_damages_to_type_damages_static_bonus_damage_id_type_damage_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "static_damage_reductions": {
+      "name": "static_damage_reductions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "static_damage_reductions_to_damage_reductions": {
+      "name": "static_damage_reductions_to_damage_reductions",
+      "columns": {
+        "static_damage_reduction_id": {
+          "name": "static_damage_reduction_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "damage_reduction_id": {
+          "name": "damage_reduction_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "static_damage_reductions_to_damage_reductions_static_damage_reduction_id_static_damage_reductions_id_fk": {
+          "name": "static_damage_reductions_to_damage_reductions_static_damage_reduction_id_static_damage_reductions_id_fk",
+          "tableFrom": "static_damage_reductions_to_damage_reductions",
+          "tableTo": "static_damage_reductions",
+          "columnsFrom": [
+            "static_damage_reduction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "static_damage_reductions_to_damage_reductions_damage_reduction_id_damage_reductions_id_fk": {
+          "name": "static_damage_reductions_to_damage_reductions_damage_reduction_id_damage_reductions_id_fk",
+          "tableFrom": "static_damage_reductions_to_damage_reductions",
+          "tableTo": "damage_reductions",
+          "columnsFrom": [
+            "damage_reduction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "static_damage_reductions_to_damage_reductions_static_damage_reduction_id_damage_reduction_id_pk": {
+          "columns": [
+            "static_damage_reduction_id",
+            "damage_reduction_id"
+          ],
+          "name": "static_damage_reductions_to_damage_reductions_static_damage_reduction_id_damage_reduction_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "static_powers": {
+      "name": "static_powers",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "static_skill_id": {
+          "name": "static_skill_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "defense_bonus_level": {
+          "name": "defense_bonus_level",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "static_damage_reduction_id": {
+          "name": "static_damage_reduction_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "static_damage_id": {
+          "name": "static_damage_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "static_powers_static_skill_id_static_skills_id_fk": {
+          "name": "static_powers_static_skill_id_static_skills_id_fk",
+          "tableFrom": "static_powers",
+          "tableTo": "static_skills",
+          "columnsFrom": [
+            "static_skill_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "static_powers_defense_bonus_level_defense_bonus_levels_level_fk": {
+          "name": "static_powers_defense_bonus_level_defense_bonus_levels_level_fk",
+          "tableFrom": "static_powers",
+          "tableTo": "defense_bonus_levels",
+          "columnsFrom": [
+            "defense_bonus_level"
+          ],
+          "columnsTo": [
+            "level"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "static_powers_static_damage_reduction_id_static_damage_reductions_id_fk": {
+          "name": "static_powers_static_damage_reduction_id_static_damage_reductions_id_fk",
+          "tableFrom": "static_powers",
+          "tableTo": "static_damage_reductions",
+          "columnsFrom": [
+            "static_damage_reduction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "static_powers_static_damage_id_static_bonus_damages_id_fk": {
+          "name": "static_powers_static_damage_id_static_bonus_damages_id_fk",
+          "tableFrom": "static_powers",
+          "tableTo": "static_bonus_damages",
+          "columnsFrom": [
+            "static_damage_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "static_skills": {
+      "name": "static_skills",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "skill_name": {
+          "name": "skill_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "level": {
+          "name": "level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "dices": {
+          "name": "dices",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "static_skills_skill_name_skills_name_fk": {
+          "name": "static_skills_skill_name_skills_name_fk",
+          "tableFrom": "static_skills",
+          "tableTo": "skills",
+          "columnsFrom": [
+            "skill_name"
+          ],
+          "columnsTo": [
+            "name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "type_damages": {
+      "name": "type_damages",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "damage_type_name": {
+          "name": "damage_type_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "type_damages_damage_type_name_damage_types_name_fk": {
+          "name": "type_damages_damage_type_name_damage_types_name_fk",
+          "tableFrom": "type_damages",
+          "tableTo": "damage_types",
+          "columnsFrom": [
+            "damage_type_name"
+          ],
+          "columnsTo": [
+            "name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "dices": {
+      "name": "dices",
+      "columns": {
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "faces": {
+          "name": "faces",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
           "autoincrement": false
         }
       },
@@ -634,7 +2294,7 @@
           "name": "slug",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "creator_id": {
@@ -649,8 +2309,7 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
-          "default": "(unixepoch())"
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -662,7 +2321,21 @@
           "isUnique": true
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "communities_creator_id_users_id_fk": {
+          "name": "communities_creator_id_users_id_fk",
+          "tableFrom": "communities",
+          "tableTo": "users",
+          "columnsFrom": [
+            "creator_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -677,8 +2350,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "text": {
-          "name": "text",
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -694,13 +2367,6 @@
     "members": {
       "name": "members",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
         "user_id": {
           "name": "user_id",
           "type": "text",
@@ -733,52 +2399,18 @@
           "name": "joined_at",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "(unixepoch())"
-        }
-      },
-      "indexes": {
-        "members_community_id_user_id_unique": {
-          "name": "members_community_id_user_id_unique",
-          "columns": [
-            "community_id",
-            "user_id"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "members_to_communities": {
-      "name": "members_to_communities",
-      "columns": {
-        "member_id": {
-          "name": "member_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "community_id": {
-          "name": "community_id",
-          "type": "text",
-          "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "members_to_communities_member_id_members_id_fk": {
-          "name": "members_to_communities_member_id_members_id_fk",
-          "tableFrom": "members_to_communities",
-          "tableTo": "members",
+        "members_user_id_users_id_fk": {
+          "name": "members_user_id_users_id_fk",
+          "tableFrom": "members",
+          "tableTo": "users",
           "columnsFrom": [
-            "member_id"
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -786,9 +2418,9 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "members_to_communities_community_id_communities_id_fk": {
-          "name": "members_to_communities_community_id_communities_id_fk",
-          "tableFrom": "members_to_communities",
+        "members_community_id_communities_id_fk": {
+          "name": "members_community_id_communities_id_fk",
+          "tableFrom": "members",
           "tableTo": "communities",
           "columnsFrom": [
             "community_id"
@@ -798,15 +2430,28 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
+        },
+        "members_role_id_roles_id_fk": {
+          "name": "members_role_id_roles_id_fk",
+          "tableFrom": "members",
+          "tableTo": "roles",
+          "columnsFrom": [
+            "role_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
-        "members_to_communities_member_id_community_id_pk": {
+        "member_pk": {
           "columns": [
-            "member_id",
+            "user_id",
             "community_id"
           ],
-          "name": "members_to_communities_member_id_community_id_pk"
+          "name": "member_pk"
         }
       },
       "uniqueConstraints": {},
@@ -854,7 +2499,21 @@
           "isUnique": true
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "roles_community_id_communities_id_fk": {
+          "name": "roles_community_id_communities_id_fk",
+          "tableFrom": "roles",
+          "tableTo": "communities",
+          "columnsFrom": [
+            "community_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -926,12 +2585,25 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
-          "default": "(unixepoch())"
+          "autoincrement": false
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "tables_system_id_systems_id_fk": {
+          "name": "tables_system_id_systems_id_fk",
+          "tableFrom": "tables",
+          "tableTo": "systems",
+          "columnsFrom": [
+            "system_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -946,8 +2618,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "genres_id": {
-          "name": "genres_id",
+        "genre_id": {
+          "name": "genre_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -969,12 +2641,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "tables_to_genres_genres_id_genres_id_fk": {
-          "name": "tables_to_genres_genres_id_genres_id_fk",
+        "tables_to_genres_genre_id_genres_id_fk": {
+          "name": "tables_to_genres_genre_id_genres_id_fk",
           "tableFrom": "tables_to_genres",
           "tableTo": "genres",
           "columnsFrom": [
-            "genres_id"
+            "genre_id"
           ],
           "columnsTo": [
             "id"
@@ -984,12 +2656,12 @@
         }
       },
       "compositePrimaryKeys": {
-        "tables_to_genres_table_id_genres_id_pk": {
+        "tables_to_genres_table_id_genre_id_pk": {
           "columns": [
             "table_id",
-            "genres_id"
+            "genre_id"
           ],
-          "name": "tables_to_genres_table_id_genres_id_pk"
+          "name": "tables_to_genres_table_id_genre_id_pk"
         }
       },
       "uniqueConstraints": {},

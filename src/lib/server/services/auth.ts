@@ -1,38 +1,35 @@
 // src/lib/services/authService.ts
-import { userInsertSchema } from '$lib/schemas/auth';
 import { eq } from 'drizzle-orm';
 import { db } from '../db';
 import {
   sessions,
+  userInsertSchema,
   users,
-  type PublicUser,
   type Session,
   type SessionInsert,
   type UserInsert,
 } from '../db/schema/auth';
-import { userSessionsView, usersView } from '../db/views/auth';
-import { encodeBase32LowerCase, encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
+import { userSessionsView, usersView, type PublicUser } from '../db/views/auth';
+import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
 import { sha256 } from '@oslojs/crypto/sha2';
-import type { RequestEvent } from '@sveltejs/kit';
-
-export const sessionCookieName = 'auth-session'; // mantive export para compatibilidade
+import { error, type RequestEvent } from '@sveltejs/kit';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
+import { m } from '$lib/paraglide/messages';
+import { randomBytes } from '$lib/utils/random';
 
 export class AuthService {
+  sessionCookieName = 'auth-session'; // mantive export para compatibilidade
   // constantes internas
   private readonly DAY_IN_MS = 1000 * 60 * 60 * 24;
 
   // --- helpers privados ---
-  private randomBytes(length: number): Uint8Array {
-    return crypto.getRandomValues(new Uint8Array(length));
-  }
-
   private hashToken(token: string): string {
     return encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
   }
 
   // --- API pública ---
   generateSessionToken(): string {
-    const bytes = this.randomBytes(18);
+    const bytes = randomBytes(18);
     return encodeBase64url(bytes);
   }
 
@@ -51,7 +48,7 @@ export class AuthService {
 
   async validateSessionToken(
     token: string,
-  ): Promise<{ session: Session | null; user: PublicUser }> {
+  ): Promise<{ session: Session | null; user: PublicUser | null }> {
     const sessionId = this.hashToken(token);
 
     const [result] = await db.select().from(userSessionsView).where(eq(sessions.id, sessionId));
@@ -87,7 +84,7 @@ export class AuthService {
   }
 
   setSessionTokenCookie(event: RequestEvent, token: string, expiresAt: Date) {
-    event.cookies.set(sessionCookieName, token, {
+    event.cookies.set(this.sessionCookieName, token, {
       expires: expiresAt,
       path: '/',
       httpOnly: true,
@@ -96,7 +93,7 @@ export class AuthService {
   }
 
   deleteSessionTokenCookie(event: RequestEvent) {
-    event.cookies.delete(sessionCookieName, { path: '/' });
+    event.cookies.delete(this.sessionCookieName, { path: '/' });
   }
 
   async validatePassword(username: string, password: string) {
@@ -114,11 +111,6 @@ export class AuthService {
     await db.delete(sessions).where(eq(sessions.userId, userId));
   }
 
-  generateUserId(): string {
-    const bytes = this.randomBytes(15);
-    return encodeBase32LowerCase(bytes);
-  }
-
   async newUser(user: UserInsert) {
     const safeUser = {
       ...user,
@@ -131,10 +123,10 @@ export class AuthService {
   }
 
   async setUpSessionAndCookies(event: RequestEvent, userId: string) {
-      const sessionToken = this.generateSessionToken();
-      const session = await this.createSession(sessionToken, userId);
+    const sessionToken = this.generateSessionToken();
+    const session = await this.createSession(sessionToken, userId);
 
-      this.setSessionTokenCookie(event, sessionToken, session.expiresAt);
+    this.setSessionTokenCookie(event, sessionToken, session.expiresAt);
   }
 
   // Métodos para obter usuário (em vez do objeto aninhado)
@@ -149,6 +141,40 @@ export class AuthService {
   getUserFromLocals(event: RequestEvent): PublicUser {
     return (event.locals.user ?? null) as PublicUser;
   }
+
+  requireLogin(event: RequestEvent, redirectTo = '/login'): PublicUser | null {
+    const user = this.getUserFromLocals(event);
+    if (!user) {
+      throw redirect(
+        redirectTo,
+        { type: 'warning', message: m['errors.required_login']() },
+        event.cookies,
+      );
+    }
+
+    return user;
+    // return this.serializeUser(user);
+  }
+
+  requireAuthOrThrow(event: RequestEvent): PublicUser | null {
+    const user = this.getUserFromLocals(event);
+    if (!user) {
+      setFlash({ type: 'error', message: m['errors.required_login']() }, event.cookies);
+      throw error(401, 'Unauthorized');
+    }
+
+    return user;
+    // return this.serializeUser(user);
+  }
+
+  // serializeUser(user: PublicUser): PublicUser {
+  //   const u = { ...user, createdAt: user?.createdAt.toISOString() } as Omit<
+  //     PublicUser,
+  //     'createdAt'
+  //   > & { createdAt: string };
+  //
+  //   return u as PublicUser;
+  // }
 }
 
 // Exporte um singleton pronto para uso

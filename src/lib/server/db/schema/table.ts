@@ -1,50 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { integer, primaryKey, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
-import { users } from './auth';
-
-export const communities = sqliteTable('communities', {
-  id: text('id').primaryKey(),
-  name: text('name').notNull(),
-  description: text('description').notNull(),
-  slug: text('slug').notNull().unique(),
-  creatorId: text('creator_id')
-    .notNull()
-    .references(() => users.id),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-});
-
-export type Community = typeof communities.$inferSelect;
-
-export const members = sqliteTable(
-  'members',
-  {
-    userId: text('user_id')
-      .notNull()
-      .references(() => users.id),
-    communityId: text('community_id')
-      .notNull()
-      .references(() => communities.id),
-    nickname: text('nickname').notNull(),
-    roleId: text('role_id')
-      .notNull()
-      .references(() => roles.id),
-    joinedAt: integer('joined_at', { mode: 'timestamp' }).notNull(),
-  },
-  t => [primaryKey({ columns: [t.userId, t.communityId], name: 'member_pk' })],
-);
-
-export const roles = sqliteTable(
-  'roles',
-  {
-    id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    description: text('description'),
-    communityId: text('community_id')
-      .notNull()
-      .references(() => communities.id),
-  },
-  t => [unique().on(t.communityId, t.name)],
-);
+import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const tables = sqliteTable('tables', {
   id: text('id').primaryKey(),
@@ -95,34 +50,3 @@ export const tablesToGenres = sqliteTable(
   },
   t => [primaryKey({ columns: [t.tableId, t.genreId] })],
 );
-
-export const rolesRelations = relations(roles, ({ many, one }) => ({
-  community: one(communities, {
-    fields: [roles.communityId],
-    references: [communities.id],
-  }),
-  members: many(members),
-}));
-
-export const communitiesRelations = relations(communities, ({ many, one }) => ({
-  creator: one(users, {
-    fields: [communities.creatorId],
-    references: [users.id],
-  }),
-  members: many(members),
-}));
-
-export const membersRelations = relations(members, ({ one }) => ({
-  user: one(users, {
-    fields: [members.userId],
-    references: [users.id],
-  }),
-  community: one(communities, {
-    fields: [members.communityId],
-    references: [communities.id],
-  }),
-  role: one(roles, {
-    fields: [members.roleId],
-    references: [roles.id],
-  }),
-}));

@@ -11,7 +11,7 @@ import {
   type RegisterInput,
 } from '$lib/schemas/auth';
 import { m } from '$lib/paraglide/messages';
-import { generateDeterministicSlug } from '$lib/utils/random';
+import { generateDeterministicSlug, generateId } from '$lib/utils/random';
 import { AuthTab } from '$lib/enums/auth-tab';
 import { hashPassword } from '$lib/server/password';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
@@ -69,7 +69,7 @@ export const actions: Actions = {
     }
 
     // criado sessao e cookie
-    authService.setUpSessionAndCookies(event, existingUser.id)
+    authService.setUpSessionAndCookies(event, existingUser.id);
 
     // sucesso -> redireciona
     redirect('/', { type: 'success', message: m['toast.login.success']() }, event.cookies);
@@ -109,7 +109,7 @@ export const actions: Actions = {
     const passwordHash = await hashPassword(password);
 
     // gera id do usuário (usa sua função generateUserId)
-    const userId = authService.generateUserId();
+    const userId = generateId();
 
     try {
       const user = {

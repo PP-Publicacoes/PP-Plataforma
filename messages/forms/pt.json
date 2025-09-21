@@ -1,0 +1,47 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "errors": {
+    "required_login": "Autenticação necessária para essa ação",
+    "form": {
+      "name": {
+        "error": "Nome inválido",
+        "required": "Nome é obrigatório",
+        "min": "Nome deve ter ao menos {min} caracteres",
+        "max": "Nome deve ter no máximo {max} caracteres"
+      },
+      "description": {
+        "max": "Descrição pode ter no máximo {max} caracteres"
+      },
+      "email": {
+        "error": "Email inválido",
+        "required": "Email é obrigatório",
+        "exists": "Já existe uma conta com esse endereço de email"
+      },
+      "password": {
+        "confirm_mismatch": "Confirmação de senha não confere",
+        "min": "Senha deve ter ao menos {min} caracteres",
+        "max": "Senha deve ter no máximo {max} caracteres",
+        "uppercase": "Senha deve ter ao menos uma letra maiúscula (A-Z)",
+        "lowercase": "Senha deve ter ao menos uma letra minúscula (a-z)",
+        "number": "Senha deve ter ao menos um número (0-9)",
+        "special": "Senha deve ter ao menos um caractere especial (ex.: !@#$%)"
+      },
+      "username": {
+        "min": "Nome de usuário deve ter ao menos {min} caracteres",
+        "max": "Nome de usuário deve ter no máximo {max} caracteres",
+        "required": "Nome de usuário é obrigatório",
+        "exists": "Já existe uma conta com esse nome de usuário"
+      },
+      "default": {
+        "invalid": "{value} inválido",
+        "error": "Ocorreu um erro"
+      },
+      "server": {
+        "error": "Erro no servidor — tente novamente mais tarde"
+      },
+      "auth": {
+        "invalid_credentials": "Credenciais inválidas"
+      }
+    }
+  }
+}

@@ -7,9 +7,9 @@ import { resetPasswordSchema, type ResetPasswordInput } from '$lib/schemas/auth'
 import { consumePasswordResetToken } from '$lib/server/reset';
 import { db } from '$lib/server/db';
 import { eq } from 'drizzle-orm';
-import * as auth from '$lib/server/auth';
 import { hashPassword } from '$lib/server/password';
 import { users } from '$lib/server/db/schema/auth';
+import { authService } from '$lib/server/services/auth';
 
 export const load: PageServerLoad = async event => {
   const token = event.params.token;
@@ -48,12 +48,8 @@ export const actions: Actions = {
     await db.update(users).set({ passwordHash }).where(eq(users.id, userId));
 
     // Segurança extra: invalida todas as sessões anteriores desse usuário
-    await auth.invalidateUserSessions(userId);
-
-    // Opcional: cria nova sessão e faz login automático
-    const sessionToken = auth.generateSessionToken();
-    const session = await auth.createSession(sessionToken, userId);
-    auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
+    await authService.invalidateUserSessions(userId);
+    await authService.setUpSessionAndCookies(event, userId);
 
     // Redireciona para home (ou /auth?t=login) com flash
     throw redirect(302, '/');

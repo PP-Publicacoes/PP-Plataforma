@@ -6,10 +6,9 @@
   import favicon from '$lib/assets/favicon.svg';
   import AppSidebar from '$lib/components/sidebar/app-sidebar.svelte';
 
-  import { page } from '$app/stores';
-  import { derived } from 'svelte/store';
+  import { derived, readable } from 'svelte/store';
   import { m } from '$lib/paraglide/messages';
-  import ThemeToggle from '$lib/components/theme-toggle.svelte';
+  import { page } from '$app/state';
 
   const titleize = (s: string) =>
     decodeURIComponent(s)
@@ -18,13 +17,13 @@
       .trim()
       .replace(/\b\w/g, m => m.toUpperCase());
 
-  const breadcrumbItems = derived(page, $page => {
-    const { pathname } = $page.url;
+  const breadcrumbItems = derived(readable(page), p => {
+    const { pathname } = p.url;
     const segments = pathname.split('/').filter(Boolean);
 
     const paths = segments.map((_, i) => '/' + segments.slice(0, i + 1).join('/'));
 
-    const overrides: Record<string, string> = ($page.data?.breadcrumbs ?? {}) as any;
+    const overrides: Record<string, string> = (p.data?.breadcrumbs ?? {}) as any;
 
     const items = segments.map((seg, i) => {
       const href = paths[i];
@@ -49,7 +48,10 @@
 </svelte:head>
 
 <Sidebar.Provider>
-  <AppSidebar user={data.user} />
+  <AppSidebar
+    user={data.user}
+    communities={data.communities}
+  />
   <Sidebar.Inset>
     <header
       class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12"

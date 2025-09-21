@@ -339,7 +339,7 @@ export const powerPowerRequirementsRelations = relations(powerPowerRequirements,
   }),
 }));
 
-export const scalablePowersRelations = relations(scalablePowers, ({ many, one }) => ({
+export const scalablePowersRelations = relations(scalablePowers, ({ many }) => ({
   powers: many(powers),
 }));
 

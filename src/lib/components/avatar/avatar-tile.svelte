@@ -1,7 +1,6 @@
 <script lang="ts">
   import * as Avatar from '$lib/components/ui/avatar/index.js';
-  import type { User } from '$lib/server/db/schema';
-  import type { PublicUser } from '$lib/types/public-user';
+  import type { User } from '$lib/server/db/schema/auth';
   import { getAvatar } from '$lib/utils/robohash';
 
   let { slug, username }: Pick<User, 'username' | 'slug'> = $props();

@@ -16,6 +16,8 @@ export const usersView = sqliteView('users_view').as(qb =>
     .from(users),
 );
 
+export type PublicUser = typeof usersView.$inferSelect;
+
 export const userSessionsView = sqliteView('user_sessions_view').as(qb =>
   qb.select().from(usersView).innerJoin(sessions, eq(usersView.id, sessions.userId)),
 );

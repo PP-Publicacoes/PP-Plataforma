@@ -3,6 +3,7 @@
  *  - XXX é derivado do userId (por hash) por padrão
  *  - opção useRawSuffix tenta extrair dígitos do userId
  */
+import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { adjectives } from '../consts/adjectives';
 import { animals } from '../consts/animals';
 
@@ -80,4 +81,13 @@ export function generateDeterministicSlug(
   const adjective = ADJECTIVES[Math.floor(hash / ANIMALS.length) % ADJECTIVES.length];
   const suffix = idToSuffix(userId, digits, options);
   return `${animal}-${adjective}-${suffix}`;
+}
+
+export function randomBytes(length: number): Uint8Array {
+  return crypto.getRandomValues(new Uint8Array(length));
+}
+
+export function generateId(): string {
+  const bytes = randomBytes(15);
+  return encodeBase32LowerCase(bytes);
 }

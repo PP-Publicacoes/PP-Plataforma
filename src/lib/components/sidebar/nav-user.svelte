@@ -7,15 +7,15 @@
   import { Button } from '$lib/components/ui/button/index.js';
   import LogOutIcon from '@lucide/svelte/icons/log-out';
   import { goto } from '$app/navigation';
-  import type { PublicUser } from '$lib/types/public-user';
   import AvatarTile from '../avatar/avatar-tile.svelte';
   import { m } from '$lib/paraglide/messages';
   import { AuthTab } from '$lib/enums/auth-tab';
   import UserRound from '@lucide/svelte/icons/user-round';
+  import type { PublicUser } from '$lib/server/db/views/auth';
 
   // Preferível expor a prop como export let (padrão Svelte).
   // Se você continua usando $props() adapte conforme necessário.
-  let { user }: { user: PublicUser } = $props();
+  let { user }: { user: PublicUser | null } = $props();
   const sidebar = useSidebar();
 
   // Navegação programática (opcional)

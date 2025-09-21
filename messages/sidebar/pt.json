@@ -1,5 +1,11 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "community": {
+    "switcher": {
+      "unknown": "Desconhecido",
+      "add": "Adicionar comunidade"
+    }
+  },
   "nav_user": {
     "profile": "Perfil",
     "notifications": "Notificações"
