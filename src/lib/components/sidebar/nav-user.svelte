@@ -11,7 +11,7 @@
   import { m } from '$lib/paraglide/messages';
   import { AuthTab } from '$lib/enums/auth-tab';
   import UserRound from '@lucide/svelte/icons/user-round';
-  import type { PublicUser } from '$lib/server/db/views/auth';
+  import type { PublicUser } from '$lib/server/db/schema';
 
   // Preferível expor a prop como export let (padrão Svelte).
   // Se você continua usando $props() adapte conforme necessário.
@@ -26,7 +26,7 @@
     goto(`auth/?t=${AuthTab.register}`);
   }
   function goToProfile() {
-    goto('/my-profile');
+    goto('/profiles/me');
   }
   function goToNotifications() {
     goto('/notifications');
@@ -85,7 +85,7 @@
             onclick={goToProfile}
           >
             <UserRound />
-            {m['nav_user.profile']()}
+            {m['routes.profiles']()}
           </Button>
           <!-- <DropdownMenu.Item> -->
           <!-- 	<CreditCardIcon /> -->
@@ -97,7 +97,7 @@
             onclick={goToNotifications}
           >
             <BellIcon />
-            {m['nav_user.notifications']()}
+            {m['routes.notifications']()}
           </Button>
 
           <DropdownMenu.Separator />

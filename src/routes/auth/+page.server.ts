@@ -1,22 +1,22 @@
 // +page.server.ts
-import { fail } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
-import type { RequestEvent } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms';
-import { zod4 } from 'sveltekit-superforms/adapters';
+import { AuthTab } from '$lib/enums/auth-tab';
+import { m } from '$lib/paraglide/messages';
 import {
   loginSchema,
   registerSchema,
   type LoginInput,
   type RegisterInput,
 } from '$lib/schemas/auth';
-import { m } from '$lib/paraglide/messages';
-import { generateDeterministicSlug, generateId } from '$lib/utils/random';
-import { AuthTab } from '$lib/enums/auth-tab';
+import { type UserInsert } from '$lib/server/db/schema/';
 import { hashPassword } from '$lib/server/password';
-import { redirect, setFlash } from 'sveltekit-flash-message/server';
-import { type UserInsert } from '$lib/server/db/schema/auth';
 import { authService } from '$lib/server/services/auth';
+import { generateDeterministicSlug, generateId } from '$lib/utils/random';
+import type { RequestEvent } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
+import { superValidate } from 'sveltekit-superforms';
+import { zod4 } from 'sveltekit-superforms/adapters';
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event: RequestEvent) => {
   // Retorna o usuário quando houver sessão ativa, caso contrário retorna {}.
@@ -44,16 +44,16 @@ export const actions: Actions = {
     const { username, password } = form.data as LoginInput;
 
     // busca usuário
-    const existingUser = (await authService.getUserByUsername(username)).at(0);
+    const existingUser = await authService.getUserByUsername(username);
     // const results = await db.select().from(users).where(eq(users.username, username));
     // const existingUser = results.at(0);
 
     if (!existingUser) {
       // marca erro genérico (não vaze info) e retorna o form
       form.valid = false;
-      form.errors?.username?.push(m['errors.form.auth.invalid_credentials']());
+      form.errors?.username?.push(m['errors.auth.invalid_credentials']());
 
-      setFlash({ type: 'error', message: m['toast.login.error']() }, event.cookies);
+      setFlash({ type: 'error', message: m['toasts.login.error']() }, event.cookies);
       return fail(400, { form });
     }
 
@@ -61,18 +61,19 @@ export const actions: Actions = {
     const validPassword = await authService.validatePassword(username, password);
 
     if (!validPassword) {
+      console.error('Senha inválida');
       form.valid = false;
-      form.errors?._errors?.push(m['errors.form.auth.invalid_credentials']());
+      form.errors?._errors?.push(m['errors.auth.invalid_credentials']());
 
-      setFlash({ type: 'error', message: m['toast.login.error']() }, event.cookies);
+      setFlash({ type: 'error', message: m['toasts.login.error']() }, event.cookies);
       return fail(400, { form });
     }
 
     // criado sessao e cookie
-    authService.setUpSessionAndCookies(event, existingUser.id);
+    await authService.setUpSessionAndCookies(event, existingUser.id);
 
     // sucesso -> redireciona
-    redirect('/', { type: 'success', message: m['toast.login.success']() }, event.cookies);
+    redirect('/', { type: 'success', message: m['toasts.login.success']() }, event.cookies);
   },
 
   // register: valida dados, verifica unicidade, hash e insere
@@ -80,30 +81,11 @@ export const actions: Actions = {
     const form = await superValidate(event, zod4(registerSchema));
 
     if (!form.valid) {
-      setFlash({ type: 'error', message: m['toast.register.error']() }, event.cookies);
+      setFlash({ type: 'error', message: m['toasts.register.error']() }, event.cookies);
       return fail(400, { form });
     }
 
     const { username, password, email } = form.data as RegisterInput;
-
-    // verifica se username ou email já existem
-    const byUsername = await authService.getUserByUsername(username);
-    if (byUsername.length > 0) {
-      form.valid = false;
-      form.errors?.username?.push(m['errors.form.username.exists']());
-
-      setFlash({ type: 'error', message: m['toast.register.error']() }, event.cookies);
-      return fail(400, { form });
-    }
-
-    const byEmail = await authService.getUserByEmail(email);
-    if (byEmail.length > 0) {
-      form.valid = false;
-      form.errors?.email?.push(m['errors.form.email.exists']());
-
-      setFlash({ type: 'error', message: m['toast.register.error']() }, event.cookies);
-      return fail(400, { form });
-    }
 
     // hash da senha
     const passwordHash = await hashPassword(password);
@@ -123,19 +105,19 @@ export const actions: Actions = {
       await authService.newUser(user);
 
       // cria sessão e seta cookie
-      authService.setUpSessionAndCookies(event, userId);
+      await authService.setUpSessionAndCookies(event, userId);
     } catch (err) {
       console.error('Register error:', err);
 
       // retorna o form com erro genérico (evite vazar detalhes de erro do DB)
       form.valid = false;
-      form.errors?._errors?.push(m['errors.form.default.error']());
+      form.errors?._errors?.push(m['errors.default.error']());
 
-      setFlash({ type: 'error', message: m['toast.default.error']() }, event.cookies);
+      setFlash({ type: 'error', message: m['toasts.default.error']() }, event.cookies);
       return fail(500, { form });
     }
 
-    redirect('/', { type: 'success', message: m['toast.register.success']() }, event.cookies);
+    redirect('/', { type: 'success', message: m['toasts.register.success']() }, event.cookies);
   },
 
   // logout (mantive sua implementação original)
@@ -147,6 +129,6 @@ export const actions: Actions = {
     await authService.invalidateSession(event.locals.session.id);
     authService.deleteSessionTokenCookie(event);
 
-    redirect('/', { type: 'success', message: m['toast.logout.success']() }, event.cookies);
+    redirect('/', { type: 'success', message: m['toasts.logout.success']() }, event.cookies);
   },
 };

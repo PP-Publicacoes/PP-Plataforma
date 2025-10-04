@@ -60,7 +60,8 @@ export async function consumePasswordResetToken(token: string) {
 
   const rec = rows.at(0);
   if (!rec) return { ok: false as const, reason: 'INVALID' };
-  if (rec.expiresAt.getTime() < now.getTime()) return { ok: false as const, reason: 'EXPIRED', record: rec };
+  if (rec.expiresAt.getTime() < now.getTime())
+    return { ok: false as const, reason: 'EXPIRED', record: rec };
 
   // marca como usado (single-use)
   await db

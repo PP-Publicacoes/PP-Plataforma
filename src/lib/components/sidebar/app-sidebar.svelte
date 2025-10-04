@@ -5,9 +5,8 @@
   import * as Sidebar from '$lib/components/ui/sidebar/index.js';
   import type { ComponentProps } from 'svelte';
   import { m } from '$lib/paraglide/messages';
-  import type { PublicUser } from '$lib/server/db/views/auth';
-  import type { SidebarCommunity } from '$lib/server/db/views/table';
   import CommunitySwitcher from './community-switcher.svelte';
+  import type { PublicUser, SidebarCommunity } from '$lib/server/db/schema';
 
   let {
     ref = $bindable(null),

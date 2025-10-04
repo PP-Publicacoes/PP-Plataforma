@@ -8,7 +8,7 @@ import { consumePasswordResetToken } from '$lib/server/reset';
 import { db } from '$lib/server/db';
 import { eq } from 'drizzle-orm';
 import { hashPassword } from '$lib/server/password';
-import { users } from '$lib/server/db/schema/auth';
+import { users } from '$lib/server/db/schema/';
 import { authService } from '$lib/server/services/auth';
 
 export const load: PageServerLoad = async event => {

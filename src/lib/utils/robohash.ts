@@ -12,7 +12,7 @@ function optionsToQuery(o?: RoboOptions): string {
   const p = new URLSearchParams();
   if (o.size) p.set('size', `${o.size}x${o.size}`);
   if (o.set) p.set('set', String(o.set));
-  if (o.bgset) p.set('bgset', String(o.bgset));
+  // if (o.bgset) p.set('bgset', String(o.bgset));
   if (o.grayscale !== undefined) p.set('grayscale', String(o.grayscale));
   if (o.extra) for (const [k, v] of Object.entries(o.extra)) p.set(k, String(v));
   const s = p.toString();

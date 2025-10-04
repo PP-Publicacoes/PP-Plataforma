@@ -1,0 +1,55 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "community": {
+    "switcher": {
+      "unknown": "Desconhecido",
+      "add": "Adicionar comunidade"
+    },
+    "label": {
+      "singular": "comunidade",
+      "plural": "comunidades"
+    },
+    "date": {
+      "created": "Criada em {date}",
+      "since": "Membro desde {date}"
+    },
+    "creator": {
+      "by": "por {username}"
+    },
+    "title": "Comunidade",
+    "description_form": "Comunidades são grupos de pessoas com interesses similares. Elas podem ser públicas ou privadas.",
+    "name": {
+      "label": "Nome da comunidade",
+      "description": "O nome da comunidade que será exibido para o público"
+    },
+    "description": {
+      "label": "Descrição da comunidade",
+      "description": "Descrição curta sobre a comunidade"
+    },
+    "public": {
+      "label": "Comunidade pública",
+      "description": "Comunidade visível para todos e entrada livre"
+    },
+    "private": {
+      "label": "Comunidade privada",
+      "description": "Comunidade visível apenas para membros e entrada mediante convite"
+    },
+    "visibility": {
+      "label": "Visibilidade da comunidade"
+    },
+    "button": {
+      "edit": "Salvar"
+    }
+  },
+  "errors": {
+    "forms": {
+      "name": {
+        "max": "Nome deve ter no máximo {max} caracteres",
+        "min": "Nome deve ter ao menos {min} caracteres"
+      },
+      "description": {
+        "max": "Descrição pode ter no máximo {max} caracteres"
+      }
+    }
+  }
+}

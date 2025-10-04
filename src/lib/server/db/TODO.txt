@@ -1,4 +1,0 @@
-- [O] mudar algumas coisas para um model, ao invés de enum
-- [] mudar os ids para numbers (quando aplicável) (acho que n vinga)
-- [] revisar a parte do sistema e ver se tá show
-- [] criar a parte de utensílios/vestimenta

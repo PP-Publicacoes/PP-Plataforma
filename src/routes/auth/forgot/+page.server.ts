@@ -8,7 +8,7 @@ import { eq } from 'drizzle-orm';
 import { forgotSchema, type ForgotInput } from '$lib/schemas/auth';
 import { createPasswordResetToken } from '$lib/server/reset';
 import { sendPasswordResetEmail } from '$lib/server/email';
-import { users } from '$lib/server/db/schema/auth';
+import { users } from '$lib/server/db/schema/';
 
 export const load: PageServerLoad = async () => {
   return {

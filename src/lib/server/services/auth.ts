@@ -1,21 +1,23 @@
 // src/lib/services/authService.ts
 import { eq } from 'drizzle-orm';
 import { db } from '../db';
-import {
-  sessions,
-  userInsertSchema,
-  users,
-  type Session,
-  type SessionInsert,
-  type UserInsert,
-} from '../db/schema/auth';
-import { userSessionsView, usersView, type PublicUser } from '../db/views/auth';
 import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
 import { sha256 } from '@oslojs/crypto/sha2';
 import { error, type RequestEvent } from '@sveltejs/kit';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { m } from '$lib/paraglide/messages';
 import { randomBytes } from '$lib/utils/random';
+import {
+  sessions,
+  userInsertSchema,
+  users,
+  usersView,
+  type PublicUser,
+  type Session,
+  type SessionInsert,
+  type UserInsert,
+} from '../db/schema';
+import { verifyPassword } from '../password';
 
 export class AuthService {
   sessionCookieName = 'auth-session'; // mantive export para compatibilidade
@@ -51,7 +53,11 @@ export class AuthService {
   ): Promise<{ session: Session | null; user: PublicUser | null }> {
     const sessionId = this.hashToken(token);
 
-    const [result] = await db.select().from(userSessionsView).where(eq(sessions.id, sessionId));
+    const [result] = await db
+      .select()
+      .from(sessions)
+      .innerJoin(usersView, eq(usersView.id, sessions.userId))
+      .where(eq(sessions.id, sessionId));
 
     if (!result) {
       return { session: null, user: null };
@@ -97,14 +103,16 @@ export class AuthService {
   }
 
   async validatePassword(username: string, password: string) {
-    return (
-      (
-        await db
-          .select({ passwordHash: users.passwordHash })
-          .from(users)
-          .where(eq(users.username, username))
-      ).at(0)?.passwordHash === password
-    );
+    const row = (
+      await db
+        .select({ passwordHash: users.passwordHash })
+        .from(users)
+        .where(eq(users.username, username))
+    ).at(0);
+
+    if (!row) return false;
+
+    return await verifyPassword(row.passwordHash, password);
   }
 
   async invalidateUserSessions(userId: string): Promise<void> {
@@ -130,24 +138,40 @@ export class AuthService {
   }
 
   // Métodos para obter usuário (em vez do objeto aninhado)
-  async getUserByUsername(username: string) {
-    return await db.select().from(usersView).where(eq(usersView.username, username));
+  async getUserByUsername(username: string): Promise<PublicUser | null> {
+    return await db
+      .select()
+      .from(usersView)
+      .where(eq(usersView.username, username))
+      .then(res => res[0]);
   }
 
-  async getUserByEmail(email: string) {
-    return await db.select().from(usersView).where(eq(usersView.email, email));
+  async getUserByEmail(email: string): Promise<PublicUser | null> {
+    return await db
+      .select()
+      .from(usersView)
+      .where(eq(usersView.email, email))
+      .then(res => res[0]);
   }
 
-  getUserFromLocals(event: RequestEvent): PublicUser {
-    return (event.locals.user ?? null) as PublicUser;
+  async getUserById(id: string): Promise<PublicUser | null> {
+    return await db
+      .select()
+      .from(usersView)
+      .where(eq(usersView.id, id))
+      .then(res => res[0]);
   }
 
-  requireLogin(event: RequestEvent, redirectTo = '/login'): PublicUser | null {
+  getUserFromLocals(event: RequestEvent): PublicUser | null {
+    return (event.locals.user as PublicUser) ?? null;
+  }
+
+  requireLogin(event: RequestEvent, redirectTo = '/auth?t=login'): PublicUser | null {
     const user = this.getUserFromLocals(event);
     if (!user) {
       throw redirect(
         redirectTo,
-        { type: 'warning', message: m['errors.required_login']() },
+        { type: 'warning', message: m['errors.auth.required_login']() },
         event.cookies,
       );
     }
@@ -159,7 +183,7 @@ export class AuthService {
   requireAuthOrThrow(event: RequestEvent): PublicUser | null {
     const user = this.getUserFromLocals(event);
     if (!user) {
-      setFlash({ type: 'error', message: m['errors.required_login']() }, event.cookies);
+      setFlash({ type: 'error', message: m['errors.auth.required_login']() }, event.cookies);
       throw error(401, 'Unauthorized');
     }
 

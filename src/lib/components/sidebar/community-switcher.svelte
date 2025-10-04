@@ -1,11 +1,13 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import * as Avatar from '$lib/components/ui/avatar/index.js';
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
   import * as Sidebar from '$lib/components/ui/sidebar/index.js';
   import { useSidebar } from '$lib/components/ui/sidebar/index.js';
   import { m } from '$lib/paraglide/messages';
-  import type { SidebarCommunity } from '$lib/server/db/views/table';
+  import type { SidebarCommunity } from '$lib/server/db/schema/social';
   import { getAvatar } from '$lib/utils/robohash';
+  import { capitalize } from '$lib/utils/text';
   import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down';
   import PlusIcon from '@lucide/svelte/icons/plus';
 
@@ -13,6 +15,7 @@
   const sidebar = useSidebar();
 
   let activeCommunity = $state(communities[0]);
+  const goToEditCommunity = () => goto('/communities/edit');
 </script>
 
 <Sidebar.Menu>
@@ -33,8 +36,9 @@
                   src={getAvatar(activeCommunity.slug, 32)}
                   alt={activeCommunity.name}
                 />
-                <Avatar.Fallback class="rounded-lg">{activeCommunity.name.slice(2)}</Avatar.Fallback
-                >
+                <Avatar.Fallback class="rounded-lg">
+                  {activeCommunity.name.slice(2)}
+                </Avatar.Fallback>
               </Avatar.Root>
             </div>
             <div class="grid flex-1 text-left text-sm leading-tight">
@@ -53,7 +57,9 @@
         side={sidebar.isMobile ? 'bottom' : 'right'}
         sideOffset={4}
       >
-        <DropdownMenu.Label class="text-muted-foreground text-xs">Teams</DropdownMenu.Label>
+        <DropdownMenu.Label class="text-muted-foreground text-xs">
+          {capitalize(m['community.label.plural']())}
+        </DropdownMenu.Label>
         {#each communities as community, index (community.name)}
           <DropdownMenu.Item
             onSelect={() => (activeCommunity = community)}
@@ -65,8 +71,9 @@
                   src={getAvatar(activeCommunity.slug, 20)}
                   alt={activeCommunity.name}
                 />
-                <Avatar.Fallback class="rounded-lg">{activeCommunity.name.slice(2)}</Avatar.Fallback
-                >
+                <Avatar.Fallback class="rounded-lg">
+                  {activeCommunity.name.slice(2)}
+                </Avatar.Fallback>
               </Avatar.Root>
             </div>
             {community.name}
@@ -74,7 +81,10 @@
           </DropdownMenu.Item>
         {/each}
         <DropdownMenu.Separator />
-        <DropdownMenu.Item class="gap-2 p-2">
+        <DropdownMenu.Item
+          class="gap-2 p-2"
+          onSelect={() => goToEditCommunity()}
+        >
           <div class="flex size-6 items-center justify-center rounded-md border bg-transparent">
             <PlusIcon class="size-4" />
           </div>

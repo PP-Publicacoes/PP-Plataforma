@@ -29,15 +29,22 @@
     validators: zod4Client(loginSchema),
     delayMs: DELAY_MS,
   });
-  const { delayed: loginDelayed, submitting: loginSubmitting } = loginForm;
   const registerForm = superForm(data.registerForm, {
     validators: zod4Client(registerSchema),
     delayMs: DELAY_MS,
   });
-  const { delayed: registerDelayed, submitting: registerSubmitting } = registerForm;
-
-  const { form: loginFormData, enhance: enhanceLogin } = loginForm;
-  const { form: registerFormData, enhance: enhanceRegister } = registerForm;
+  const {
+    delayed: loginDelayed,
+    submitting: loginSubmitting,
+    form: loginFormData,
+    enhance: loginEnhance,
+  } = loginForm;
+  const {
+    form: registerFormData,
+    enhance: registerEnhance,
+    delayed: registerDelayed,
+    submitting: registerSubmitting,
+  } = registerForm;
 </script>
 
 <Tabs.Root value={data.tab}>
@@ -50,7 +57,7 @@
   <Tabs.Content value={AuthTab.login}>
     <form
       method="POST"
-      use:enhanceLogin
+      use:loginEnhance
       action="?/{AuthTab.login}"
       class="flex flex-col gap-1"
     >
@@ -125,8 +132,10 @@
         {m['login.footer']()}
         <a
           href="?t={AuthTab.register}"
-          class="underline underline-offset-4">{m['auth_tab.register']()}</a
+          class="underline underline-offset-4"
         >
+          {m['auth_tab.register']()}
+        </a>
       </div>
     </form>
   </Tabs.Content>
@@ -135,7 +144,7 @@
   <Tabs.Content value={AuthTab.register}>
     <form
       method="POST"
-      use:enhanceRegister
+      use:registerEnhance
       action="?/{AuthTab.register}"
       class="flex flex-col gap-1"
     >
@@ -239,8 +248,10 @@
         {m['register.footer']()}
         <a
           href="?t={AuthTab.login}"
-          class="underline underline-offset-4">{m['auth_tab.login']()}</a
+          class="underline underline-offset-4"
         >
+          {m['auth_tab.login']()}
+        </a>
       </div>
     </form>
   </Tabs.Content>

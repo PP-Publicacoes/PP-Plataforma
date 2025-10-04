@@ -1,4 +1,37 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "unknown": "Desconhecido"
+  "toasts": {
+    "login": {
+      "loading": "Logando na sua conta...",
+      "success": "Login feito com sucesso!",
+      "error": "Erro ao fazer login na sua conta"
+    },
+    "register": {
+      "loading": "Criando sua conta...",
+      "success": "Conta criada com sucesso!",
+      "error": "Erro ao criar sua conta"
+    },
+    "logout": {
+      "success": "Logout feito com sucesso"
+    },
+    "community": {
+      "edit": {
+        "loading": "Salvando comunidade...",
+        "success": "Comunidade salva com sucesso!",
+        "error": "Erro ao salvar comunidade"
+      }
+    },
+    "default": {
+      "loading": "Enviando...",
+      "success": "Enviado com sucesso!",
+      "error": "Erro no envio"
+    }
+  },
+  "routes": {
+    "home": "Início",
+    "communities": "Comunidades",
+    "edit": "Editar",
+    "profiles": "Perfis",
+    "notifications": "Notificações"
+  }
 }

@@ -17,5 +17,7 @@
   "bracketSpacing": true,
   "experimentalTernaries": true,
   "objectWrap": "preserve",
-  "singleAttributePerLine": true
+  "singleAttributePerLine": true,
+  "svelteBracketNewLine": true,
+  "htmlWhitespaceSensitivity": "ignore"
 }

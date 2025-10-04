@@ -7,11 +7,8 @@
   "plugin.inlang.messageFormat": {
     "pathPattern": [
       "./messages/auth/{locale}.json",
-      "./messages/sidebar/{locale}.json",
-      "./messages/routes/{locale}.json",
+      "./messages/social/{locale}.json",
       "./messages/table/{locale}.json",
-      "./messages/toast/{locale}.json",
-      "./messages/forms/{locale}.json",
       "./messages/general/{locale}.json"
     ]
   },

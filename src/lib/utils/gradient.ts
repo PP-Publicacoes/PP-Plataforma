@@ -63,13 +63,19 @@ function rgbToHex({ r, g, b }: { r: number; g: number; b: number }) {
 
 /** luminância relativa (WCAG) */
 function relativeLuminance({ r, g, b }: { r: number; g: number; b: number }) {
-  const srgb = [r, g, b].map(v => v / 255).map(c => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)));
+  const srgb = [r, g, b]
+    .map(v => v / 255)
+    .map(c => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)));
   return 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2];
 }
 
 /** mistura simples (média) de dois RGB */
 function mixRgb(a: { r: number; g: number; b: number }, b: { r: number; g: number; b: number }) {
-  return { r: Math.round((a.r + b.r) / 2), g: Math.round((a.g + b.g) / 2), b: Math.round((a.b + b.b) / 2) };
+  return {
+    r: Math.round((a.r + b.r) / 2),
+    g: Math.round((a.g + b.g) / 2),
+    b: Math.round((a.b + b.b) / 2),
+  };
 }
 
 export function tailwindGradientFromSlug(slug: string) {

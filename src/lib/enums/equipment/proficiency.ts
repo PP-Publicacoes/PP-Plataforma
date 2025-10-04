@@ -1,6 +1,6 @@
-import { CategoriaProtecao } from "./defense";
-import { TipoEquipamento } from "./equipment";
-import { CategoriaArma } from "./weapon";
+import { CategoriaProtecao } from './defense';
+import { TipoEquipamento } from './equipment';
+import { CategoriaArma } from './weapon';
 
 export const Proficiencia = {
   armasSimples: CategoriaArma.simples,

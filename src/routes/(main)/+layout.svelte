@@ -5,10 +5,8 @@
   import '../../app.css';
   import favicon from '$lib/assets/favicon.svg';
   import AppSidebar from '$lib/components/sidebar/app-sidebar.svelte';
-
-  import { derived, readable } from 'svelte/store';
-  import { m } from '$lib/paraglide/messages';
   import { page } from '$app/state';
+  import { kRouteLabel, Route } from '$lib/enums/routes';
 
   const titleize = (s: string) =>
     decodeURIComponent(s)
@@ -17,26 +15,28 @@
       .trim()
       .replace(/\b\w/g, m => m.toUpperCase());
 
-  const breadcrumbItems = derived(readable(page), p => {
-    const { pathname } = p.url;
-    const segments = pathname.split('/').filter(Boolean);
+  type Crumb = { label: string; href: string; isLast: boolean };
 
+  const breadcrumbItems: Crumb[] = $derived.by(() => {
+    const { pathname } = page.url;
+    const segments = pathname.split('/').filter(Boolean);
     const paths = segments.map((_, i) => '/' + segments.slice(0, i + 1).join('/'));
 
-    const overrides: Record<string, string> = (p.data?.breadcrumbs ?? {}) as any;
+    const overrides = (page.data?.breadcrumbs ?? {}) as Record<string, string>;
 
     const items = segments.map((seg, i) => {
       const href = paths[i];
-      const label = overrides[href] ?? titleize(seg);
+      const label = overrides[href] ?? kRouteLabel[seg as Route] ?? titleize(seg);
       return { label, href, isLast: i === segments.length - 1 };
     });
 
     if (items.length === 0) {
-      return [{ label: m['home'](), href: '/', isLast: true }];
+      return [{ label: kRouteLabel[Route.home], href: '/', isLast: true }];
     }
 
-    return [{ label: m['home'](), href: '/', isLast: false }, ...items];
+    return [{ label: kRouteLabel[Route.home], href: '/', isLast: false }, ...items];
   });
+
   let { children, data } = $props();
 </script>
 
@@ -65,7 +65,7 @@
 
         <Breadcrumb.Root>
           <Breadcrumb.List>
-            {#each $breadcrumbItems as item, i}
+            {#each breadcrumbItems as item, i}
               <Breadcrumb.Item class="hidden md:block">
                 {#if item.isLast}
                   <Breadcrumb.Page aria-current="page">{item.label}</Breadcrumb.Page>
@@ -73,7 +73,7 @@
                   <Breadcrumb.Link href={item.href}>{item.label}</Breadcrumb.Link>
                 {/if}
               </Breadcrumb.Item>
-              {#if i < $breadcrumbItems.length - 1}
+              {#if i < breadcrumbItems.length - 1}
                 <Breadcrumb.Separator class="hidden md:block" />
               {/if}
             {/each}
