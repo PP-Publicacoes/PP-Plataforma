@@ -6,13 +6,15 @@
 - [x] Move community and stuff to schema/social.ts
 - [x] Community tags
   - [x] black, lgbt, family and stuff (tag scope instead)
-- [] Create community card
+- [X] Create community card
   - [x] Create random bg API or random color gradient
-- [] Edit community
-  - [] svelte form
-  - [] +page.server
-  - [] +page
+- [X] Edit community
+  - [X] svelte form
+  - [X] +page.server
+  - [X] +page
+  - [] edit, not create
 - [] Profile page
+- [] Finish members, permissions, roles and stuff from community
 - [] Create md drizzle schema
   - [] name convention
   - [] resume drizzle workflow in relations
